@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ground Motion Modeling — Asiye Aziz Zanjani</title>
+<link rel="stylesheet" href="style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,600;1,400&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ink:        #1a1a1e;
+    --ink-soft:   #3d3d45;
+    --ink-muted:  #7a7a88;
+    --paper:      #f7f6f2;
+    --paper-warm: #eeede8;
+    --amber:      #b05c10;
+    --amber-light:#f5e8d8;
+    --amber-mid:  #d4751a;
+    --slate:      #3a4a5c;
+    --slate-light:#dce4ee;
+    --rule:       #d4d2cc;
+    --mono:  'IBM Plex Mono', monospace;
+    --serif: 'Libre Baskerville', Georgia, serif;
+    --sans:  'Inter', system-ui, sans-serif;
+  }
+
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 17px;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── Hero ── */
+  .research-hero {
+    background: var(--ink);
+    padding: 5rem 2rem 4rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .research-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      -55deg, transparent, transparent 28px,
+      rgba(176,92,16,0.07) 28px, rgba(176,92,16,0.07) 30px
+    );
+    pointer-events: none;
+  }
+  .research-hero-inner { max-width: 860px; margin: 0 auto; position: relative; }
+
+  .hero-eyebrow {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #e0a060;
+    margin-bottom: 1.4rem;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+  }
+  .hero-eyebrow::after {
+    content: '';
+    display: block;
+    height: 1px;
+    width: 40px;
+    background: #e0a060;
+    opacity: 0.6;
+  }
+  .research-hero h1 {
+    font-family: var(--serif);
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    font-weight: 700;
+    line-height: 1.18;
+    margin-bottom: 1.5rem;
+    color: #fff;
+  }
+  .research-hero h1 em { color: #e0a060; font-style: italic; }
+  .hero-lead {
+    font-family: var(--serif);
+    font-size: 1.15rem;
+    font-style: italic;
+    color: rgba(247,246,242,0.72);
+    max-width: 640px;
+    line-height: 1.65;
+    margin-bottom: 2.5rem;
+  }
+  .hero-meta { display: flex; gap: 2rem; flex-wrap: wrap; }
+  .meta-item { font-family: var(--mono); font-size: 0.75rem; color: rgba(247,246,242,0.5); }
+  .meta-item strong { display: block; color: rgba(247,246,242,0.88); font-size: 0.8rem; margin-bottom: 0.2rem; }
+
+  /* ── Research tab strip ── */
+  .section-nav {
+    background: var(--paper-warm);
+    border-bottom: 1px solid var(--rule);
+    padding: 0 2rem;
+    position: sticky;
+    top: 0;
+    z-index: 90;
+  }
+  .section-nav-inner {
+    max-width: 860px;
+    margin: 0 auto;
+    display: flex;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .section-nav-inner::-webkit-scrollbar { display: none; }
+  .section-nav a {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    text-decoration: none;
+    padding: 0.85rem 1.2rem;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+    transition: color 0.2s, border-color 0.2s;
+  }
+  .section-nav a:hover { color: var(--ink); }
+  .section-nav a.active { color: var(--ink); border-color: var(--amber); }
+
+  /* ── Main ── */
+  .research-main {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 0 2rem 6rem;
+  }
+
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    text-decoration: none;
+    margin: 2rem 0 2.5rem;
+    transition: color 0.2s;
+  }
+  .back-link:hover { color: var(--ink); }
+
+  /* ── Narrative sections ── */
+  .narrative-section {
+    padding: 4rem 0 1rem;
+    border-top: 1px solid var(--rule);
+    margin-top: 2rem;
+  }
+  .narrative-section:first-child { border-top: none; margin-top: 0; padding-top: 3.5rem; }
+
+  .section-label {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 0.8rem;
+  }
+  .section-label.slate { color: var(--slate); }
+
+  .narrative-section h2 {
+    font-family: var(--serif);
+    font-size: clamp(1.4rem, 3vw, 1.85rem);
+    font-weight: 700;
+    line-height: 1.25;
+    margin-bottom: 1.4rem;
+    color: var(--ink);
+  }
+  .narrative-section h2 em { font-style: italic; color: var(--amber); }
+
+  h3 {
+    font-family: var(--serif);
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin: 2.2rem 0 0.7rem;
+    color: var(--ink);
+  }
+
+  .narrative-section p {
+    font-size: 1rem;
+    line-height: 1.8;
+    color: var(--ink-soft);
+    max-width: 720px;
+    margin-bottom: 1.2rem;
+  }
+  .narrative-section p:last-child { margin-bottom: 0; }
+  strong { color: var(--ink); font-weight: 600; }
+
+  /* ── Figure ── */
+  .fig-block {
+    margin: 2.5rem 0;
+    border: 1px solid var(--rule);
+    background: #fff;
+    max-width: 860px;
+  }
+  .fig-img-area { border-bottom: 1px solid var(--rule); overflow: hidden; }
+  .fig-img-area img { width: 100%; display: block; }
+  .fig-caption {
+    padding: 0.9rem 1.1rem;
+    background: var(--paper-warm);
+  }
+  .fig-caption strong {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--slate);
+    display: block;
+    margin-bottom: 0.35rem;
+  }
+  .fig-caption p {
+    font-size: 0.85rem !important;
+    color: var(--ink-soft) !important;
+    margin: 0 !important;
+    max-width: none !important;
+    line-height: 1.55 !important;
+  }
+
+  /* ── Pull quote ── */
+  .pull-quote {
+    border-left: 3px solid var(--amber);
+    margin: 2rem 0;
+    padding: 1.2rem 1.5rem;
+    background: var(--amber-light);
+    max-width: 660px;
+  }
+  .pull-quote p {
+    font-family: var(--serif) !important;
+    font-size: 1.05rem !important;
+    font-style: italic;
+    color: var(--ink) !important;
+    margin: 0 !important;
+    line-height: 1.6 !important;
+  }
+  .pull-quote cite {
+    display: block;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--ink-muted);
+    margin-top: 0.6rem;
+    font-style: normal;
+  }
+
+  /* ── Stat row ── */
+  .stat-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 1px;
+    background: var(--rule);
+    border: 1px solid var(--rule);
+    margin: 2rem 0;
+    max-width: 720px;
+  }
+  .stat-cell { background: var(--paper); padding: 1.2rem 1.4rem; }
+  .stat-num {
+    font-family: var(--mono);
+    font-size: 1.65rem;
+    font-weight: 600;
+    line-height: 1;
+    display: block;
+  }
+  .stat-num.amber { color: var(--amber); }
+  .stat-num.slate { color: var(--slate); }
+  .stat-label {
+    font-family: var(--sans);
+    font-size: 0.78rem;
+    color: var(--ink-muted);
+    margin-top: 0.35rem;
+    line-height: 1.3;
+  }
+
+  /* ── Inset note ── */
+  .inset-note {
+    border: 1px solid var(--slate);
+    background: var(--slate-light);
+    padding: 1.4rem 1.6rem;
+    margin: 2rem 0;
+    max-width: 720px;
+  }
+  .inset-note h4 {
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--slate);
+    margin-bottom: 0.6rem;
+  }
+  .inset-note p {
+    font-size: 0.9rem !important;
+    color: var(--ink-soft) !important;
+    margin-bottom: 0.5rem !important;
+    max-width: none !important;
+    line-height: 1.65 !important;
+  }
+  .inset-note p:last-child { margin-bottom: 0 !important; }
+
+  /* ── Compare strip ── */
+  .compare-strip {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: var(--rule);
+    border: 1px solid var(--rule);
+    margin: 2rem 0;
+    max-width: 720px;
+  }
+  .compare-cell { background: var(--paper); padding: 1.3rem 1.4rem; }
+  .compare-cell.nch { border-top: 3px solid var(--slate); }
+  .compare-cell.cch { border-top: 3px solid var(--amber); }
+  .compare-cell h5 {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    margin-bottom: 0.6rem;
+  }
+  .compare-cell p { font-size: 0.9rem; margin-bottom: 0; color: var(--ink-soft); }
+  .compare-cell p strong { color: var(--ink); }
+  @media (max-width: 560px) { .compare-strip { grid-template-columns: 1fr; } }
+
+  /* ── Resource links ── */
+  .resource-links {
+    margin-top: 2rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════ Site nav ══════ -->
+<nav>
+  <div class="nav-inner">
+    <ul class="nav-links">
+      <li><a href="index.html">About</a></li>
+      <li><a href="research.html" class="active">Research</a></li>
+      <li><a href="publications.html">Publications</a></li>
+      <li><a href="software.html">Software &amp; Catalogs</a></li>
+      <li><a href="teaching.html">Teaching</a></li>
+      <li><a href="cv.html">CV</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- ══════ Hero ══════ -->
+<header class="research-hero">
+  <div class="research-hero-inner">
+    <div class="hero-eyebrow">Research · Ground Motion · Seismic Hazard</div>
+    <h1>How fast does the ground <em>stop shaking</em>?</h1>
+    <p class="hero-lead">Chile produces a megathrust earthquake roughly every decade. Understanding how seismic energy decays, and why it decays differently in the north versus the south, is foundational to predicting how hard those earthquakes will shake the ground.</p>
+    <div class="hero-meta">
+      <div class="meta-item"><strong>Method</strong>Stochastic source–attenuation modeling</div>
+      <div class="meta-item"><strong>Data</strong>&gt;10,000 weak motion records</div>
+      <div class="meta-item"><strong>Region</strong>Chilean Subduction Zone</div>
+    </div>
+  </div>
+</header>
+
+<!-- ══════ Research sub-nav (tabs) ══════ -->
+<nav class="section-nav" aria-label="Research areas">
+  <div class="section-nav-inner">
+    <a href="research.html">Overview</a>
+    <a href="research-ml.html">ML for Seismology</a>
+    <a href="research-imaging.html">Crustal Imaging</a>
+    <a href="research-induced.html">Induced Seismicity</a>
+    <a href="research-groundmotion.html" class="active">Ground Motion</a>
+  </div>
+</nav>
+
+<!-- ══════ Content ══════ -->
+<main>
+  <div class="research-main">
+
+    <a class="back-link" href="research.html">← Research overview</a>
+
+    <!-- ── 1. Setting ── -->
+    <div class="narrative-section" id="setting">
+      <div class="section-label slate">Setting</div>
+      <h2>The world's most active subduction margin</h2>
+
+      <p>The Peru–Chile trench runs 6,000 km along the eastern Pacific, where the Nazca Plate subducts beneath South America at roughly 7.6 cm per year. It has produced the largest earthquake ever recorded, the 1960 Mw 9.5 Valdivia event, and generates a megathrust rupture of Mw 8+ approximately every decade. But the margin is not uniform. Structural heterogeneity, thermal gradients, and fluid conditions vary strongly along strike, and these variations produce measurable differences in how seismic waves propagate and attenuate from one segment to the next.</p>
+
+      <p>This study focuses on two recent major ruptures that together sample contrasting crustal environments: the <strong>2014 Mw 8.2 Iquique earthquake</strong> in northern Chile (NCH, 18°–25°S) and the <strong>2010 Mw 8.8 Maule earthquake</strong> in central Chile (CCH, 33°–38.5°S). Their aftershock sequences collectively provided more than 10,000 weak motion records, a dataset dense enough to map attenuation structure at scales and frequency ranges impossible to reach with the sparse strong-motion database from large events alone.</p>
+
+      <div class="stat-row">
+        <div class="stat-cell">
+          <span class="stat-num amber">&gt;10,000</span>
+          <div class="stat-label">Weak motion records analyzed across three sub-regions</div>
+        </div>
+        <div class="stat-cell">
+          <span class="stat-num slate">1,984</span>
+          <div class="stat-label">Aftershocks, Ml 2.5–6.3, focal depth &lt;40 km</div>
+        </div>
+        <div class="stat-cell">
+          <span class="stat-num amber">0.25–20 Hz</span>
+          <div class="stat-label">Frequency range analyzed</div>
+        </div>
+        <div class="stat-cell">
+          <span class="stat-num slate">3</span>
+          <div class="stat-label">Sub-regions: Iquique (IQ), Valparaíso (VA), Maule (MA)</div>
+        </div>
+      </div>
+
+      <p>Three sub-regions are defined within this framework. The <strong>Iquique (IQ)</strong> dataset samples NCH, recorded by 35 permanent IPOC network stations. The <strong>Valparaíso (VA)</strong> and <strong>Maule (MA)</strong> datasets both sample CCH, recorded by different subsets of the 138 temporary IMAD broadband sensors deployed after the 2010 Maule earthquake. The overlap between VA and MA, different stations recording the same crustal segment, serves as a built-in consistency check on the regional attenuation signal.</p>
+    </div>
+
+    <!-- ── 2. Method ── -->
+    <div class="narrative-section" id="method">
+      <div class="section-label">The Method</div>
+      <h2>Reading attenuation from the recorded ground motion</h2>
+
+      <p>The analysis uses a <strong>stochastic point-source framework</strong> that decomposes observed ground motion amplitude into three separable contributions: a distance-dependent attenuation term D(r), an event-specific source excitation term, and a station site term (Boore 2003). Crucially, both the time-domain signal, peak ground velocity (PGV) filtered at narrow frequency bands, and the frequency-domain signal, root-mean-square Fourier velocity spectra (FVS), are analyzed in parallel, providing redundant constraints on the same underlying physics.</p>
+
+      <p>The forward model expresses amplitude as a product of source spectrum, geometric spreading g(r), frequency-dependent anelastic attenuation Q(f), and a near-surface high-frequency decay term κ₀. An iterative damped least-squares regression recovers the empirical D(r) and source excitations simultaneously, without assuming the shape of either. The reference distance is fixed at 100 km to minimize extrapolation effects.</p>
+
+      <div class="inset-note">
+        <h4>Why weak motion, not just strong motion?</h4>
+        <p>Strong-motion databases from large earthquakes are sparse: a magnitude 8 event in Chile might add a few dozen usable records. Aftershock sequences add thousands of moderate events that densely sample the propagation medium at distances, azimuths, and frequency ranges the strong-motion database never reaches. At low to moderate ground motion levels, site response is linear, so site amplification can be cleanly separated from path effects. And critically, moderate events have corner frequencies in the 5–15 Hz range, providing clear spectral separation between source and path that large events, with corner frequencies below 1 Hz, cannot offer. The trade-off is that magnitude scaling must ultimately be anchored to strong-motion data for engineering applications. This study provides the path and site parameterization; strong-motion databases provide the magnitude scaling.</p>
+      </div>
+    </div>
+
+    <!-- ── 3. Main figure ── -->
+    <div class="narrative-section" id="results">
+      <div class="section-label">Results</div>
+      <h2>Two crusts, two attenuation regimes, one figure tells the story</h2>
+
+      <p>The composite figure below integrates the core results across all three sub-regions. Read it in three layers, from top to bottom: the tectonic context and dataset geometry; the forward-modeled distance attenuation and its physical interpretation through phase velocities; and the source excitation spectra that encode how energy is generated at the source and how it is modified by the path.</p>
+
+      <div class="fig-block">
+        <div class="fig-img-area">
+          <img src="figure13.png">
+        </div>
+        <div class="fig-caption">
+          <strong>Attenuation structure and source excitation across the Chilean subduction zone</strong>
+          <p><strong>Top:</strong> The Chilean margin with the NCH and CCH study boxes and major megathrust ruptures since 1970. Forward-modeled distance attenuation functions D(r) for IQ, VA, and MA, colored by frequency (0.25–20 Hz), with residuals below. CCH paths (VA, MA) decay faster than NCH (IQ), particularly at low frequencies. Distributions of Vmax, the apparent velocity of the S-wave peak amplitude, split by distance (&lt;300 km and ≥300 km). At short distances, Vmax clusters tightly near 3.5 km/s (Lg-dominated crustal propagation). Beyond 300 km, high-frequency Vmax shifts toward 4 km/s, signaling the growing contribution of mantle phases (Sn) that the point-source model cannot capture. <strong>Bottom:</strong> Source excitation spectra at 100 km for IQ, VA, and MA across magnitude bins M4–M6. Gray curves are individual events; blue are those with known Mw; black is the observed mean; dashed red is the forward model. CCH shows larger intermediate-frequency excitation (0.5–5 Hz) across all magnitudes; residuals (Pred − Obs) are near zero across the full frequency range 
+          <a href="publications.html" target="_blank" rel="noopener">(Aziz Zanjani &amp; Herrmann 2026, in revision).</a></p>
+        </div>
+      </div>
+
+      <h3>The 300 km boundary: when the model meets its limit</h3>
+
+      <p>The Vmax distributions (middle panels) reveal a physical limit of the point-source stochastic approach. Below 300 km, peak amplitudes travel at ~3.5 km/s, consistent with Lg, the dominant crustal surface wave in regional propagation. Beyond 300 km, particularly at high frequencies, Vmax shifts toward 4 km/s, the velocity of Sn mantle phases. A single-exponent geometric spreading model cannot account for this transition, producing systematic residuals at large distances and high frequencies. This is not a failure of the model; it is physically interpretable evidence that crustal and mantle phases must be separated explicitly in any broadband stochastic approach applied beyond ~250 km.</p>
+
+      <div class="pull-quote">
+        <p>The point-source model works where crustal S waves dominate. Where mantle phases enter the wavefield, a more sophisticated multi-phase approach is required. The Vmax distributions show exactly where that transition happens.</p>
+        <cite>— A constraint on stochastic ground motion modeling under the assumption of S-wave propagation</cite>
+      </div>
+
+      <h3>Source excitations and the two-corner frequency model</h3>
+
+      <p>The source excitation panels (bottom row) show that the standard single-corner Brune model fails to fit the low-frequency spectral content for larger events, it systematically underpredicts energy below ~1 Hz at M5–6. A <strong>two-corner frequency source model</strong> (Atkinson &amp; Silva, 2000) resolves this, providing substantially better fits across the full bandwidth. The estimated κ₀ values, 0.035 s for IQ and VA, 0.04 s for MA, are spatially consistent and within the expected range for subduction zone settings, confirming that near-surface high-frequency attenuation does not vary significantly between NCH and CCH at shallow depths.</p>
+
+      <h3>Northern Chile attenuates less, and the reasons are geological</h3>
+
+      <p>The key result is unambiguous: <strong>CCH systematically attenuates seismic energy faster than NCH</strong>, with quality factors Q₀ of 380 (IQ), 320 (VA), and 400 (MA), and frequency dependence η of 0.35 for IQ and VA, 0.30 for MA. The difference is most pronounced at frequencies below 4 Hz, where energy dissipation mechanisms are most sensitive to temperature and fluid content.</p>
+
+      <div class="compare-strip">
+        <div class="compare-cell nch">
+          <h5>Northern Chile — Iquique (NCH)</h5>
+          <p><strong>Q₀ = 380, η = 0.35.</strong> Cold, arid forearc underlain by old, rigid lithosphere with low fluid content. The Salar de Atacama block has elevated Qp values and high electrical resistivity, consistent with a poorly hydrated crust. Seismic energy propagates efficiently, flatter D(r) curves, less energy loss per unit distance. Higher intermediate-frequency excitation for large events reflects this efficient transmission.</p>
+        </div>
+        <div class="compare-cell cch">
+          <h5>Central Chile — Valparaíso &amp; Maule (CCH)</h5>
+          <p><strong>Q₀ = 320–400, η = 0.30–0.35.</strong> Normally dipping slab promotes a hot mantle wedge and active volcanism as shallow as ~20 km. The Liquiñe–Ofqui Fault System creates permeable pathways for deep hydrothermal fluids, saturating the upper crust. Higher attenuation is consistent with partially molten material and elevated Vp/Vs ratios documented in body-wave tomography. D(r) curves decay steeply, particularly at low frequencies.</p>
+        </div>
+      </div>
+
+      <p>This contrast is not an artifact of the methodology. The similar attenuation between the VA and MA datasets, collected from entirely different station sets within CCH, confirms the signal is a robust regional feature. The pattern aligns independently with non-ergodic ground motion modeling by Macedo and Liu (2022), which derived spatially varying anelastic attenuation coefficients from strong-motion data using a cell-specific Bayesian approach. Converting their cell coefficients to effective Q values at 5 Hz yields ~2,500 for NCH versus ~840 for CCH, a threefold contrast in the same direction as our results, though different in absolute magnitude because their dataset integrates over deeper, colder forearc lithosphere not sampled by our shallow (&lt;40 km) dataset.</p>
+    </div>
+
+    <!-- ── 4. Implications ── -->
+    <div class="narrative-section" id="implications">
+      <div class="section-label slate">Hazard Implications</div>
+      <h2>From weak motion to hazard: what the attenuation contrast means</h2>
+
+      <p>For seismic hazard assessment, the documented attenuation contrast between NCH and CCH has implications that cut in two directions. First, the <strong>median ground motion predictions themselves</strong> are affected: for coastal sites in CCH at distances of 100–200 km from a megathrust rupture, the faster attenuation means somewhat lower median shaking than the same source would produce in NCH at equivalent distances. More importantly for modern probabilistic hazard analysis, the contrast is a systematic, spatially correlated effect that traditional ergodic ground motion models incorrectly treat as aleatory (irreducible) variability.</p>
+
+      <p>Non-ergodic models, by explicitly partitioning this kind of systematic path effect into the epistemic uncertainty budget, can reduce total standard deviation substantially. Macedo and Liu (2022) demonstrated that non-ergodic modeling for Chile reduces the aleatory standard deviation from ~0.85 to ~0.67 for PGA, a 15–25% reduction in 84th-percentile hazard estimates at well-instrumented sites. The weak-motion Q(f) models developed here provide <strong>physically grounded, frequency-explicit parameterization</strong> that can directly inform the cell-specific attenuation terms in that non-ergodic framework, extending its frequency range and validating its spatial patterns from an independent dataset and methodology.</p>
+
+      <p>More broadly, the approach demonstrates that crustal properties measurable from moderate earthquakes, anelastic attenuation Q(f), geometric spreading g(r), linear site amplification, scale reliably to larger events. This matters especially for regions that have not yet experienced a recorded megathrust rupture: the aftershock sequences of neighboring events can constrain the regional path and site structure in advance of the next large earthquake.</p>
+
+      <div class="resource-links">
+        <a class="paper-link" href="publications.html">↗ Aziz Zanjani &amp; Herrmann 2026 (in revision, ESS)</a>
+        <a class="paper-link" href="https://www.daveboore.com/software_online.html" target="_blank">↗ Boore SMSIM package</a>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<!-- ══════ Site footer ══════ -->
+<footer>
+  <div class="footer-inner">
+    <p>&copy; 2026 Asiye Aziz Zanjani, Ph.D.</p>
+    <div class="footer-icons">
+      <a href="https://scholar.google.com/citations?user=vzA30FwAAAAJ&hl=en&oi=sra" target="_blank" rel="noopener noreferrer">Scholar</a>
+      <a href="https://www.researchgate.net/profile/Asiye-Aziz-Zanjani" target="_blank" rel="noopener noreferrer">ResearchGate</a>
+      <a href="https://www.linkedin.com/in/asiye-aziz-zanjani-1232ab59/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+      <a href="https://github.com/Asiye-Aziz-Zanjani" target="_blank" rel="noopener noreferrer">GitHub</a>
+      <a href="https://orcid.org/0000-0003-3344-9720" target="_blank" rel="noopener noreferrer">ORCID</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

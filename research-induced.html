@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mapping Induced Earthquakes in the Delaware Basin — A. Aziz Zanjani</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,600;1,400&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ink: #1a1a1e;
+    --ink-soft: #3d3d45;
+    --ink-muted: #7a7a88;
+    --paper: #f7f6f2;
+    --paper-warm: #eeede8;
+    --seismic: #c0392b;
+    --seismic-light: #f2e0de;
+    --depth: #1a4b7a;
+    --depth-light: #d0e0f0;
+    --injection: #e67e22;
+    --injection-light: #faebd7;
+    --rule: #d4d2cc;
+    --mono: 'IBM Plex Mono', monospace;
+    --serif: 'Libre Baskerville', Georgia, serif;
+    --sans: 'Inter', system-ui, sans-serif;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 17px;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── Hero ── */
+  .hero {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 5rem 2rem 4rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      -55deg, transparent, transparent 28px,
+      rgba(192,57,43,0.06) 28px, rgba(192,57,43,0.06) 30px
+    );
+    pointer-events: none;
+  }
+  .hero-inner { max-width: 860px; margin: 0 auto; position: relative; }
+  .hero-eyebrow {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--seismic);
+    margin-bottom: 1.4rem;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+  }
+  .hero-eyebrow::after {
+    content: ''; display: block; height: 1px; width: 40px;
+    background: var(--seismic); opacity: 0.6;
+  }
+  .hero h1 {
+    font-family: var(--serif);
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    font-weight: 700; line-height: 1.18;
+    margin-bottom: 1.5rem; color: #fff;
+  }
+  .hero h1 em { color: var(--seismic); font-style: italic; }
+  .hero-lead {
+    font-family: var(--serif);
+    font-size: 1.15rem; font-style: italic;
+    color: rgba(247,246,242,0.75);
+    max-width: 640px; line-height: 1.6; margin-bottom: 2.5rem;
+  }
+  .hero-meta { display: flex; gap: 2rem; flex-wrap: wrap; }
+  .meta-item { font-family: var(--mono); font-size: 0.75rem; color: rgba(247,246,242,0.55); }
+  .meta-item strong { display: block; color: rgba(247,246,242,0.9); font-size: 0.8rem; margin-bottom: 0.2rem; }
+
+  /* ── Section Nav (research tabs) ── */
+  .section-nav {
+    background: var(--paper-warm);
+    border-bottom: 1px solid var(--rule);
+    padding: 0 2rem;
+    position: sticky; top: 43px; z-index: 100;
+  }
+  .section-nav-inner {
+    max-width: 860px; margin: 0 auto;
+    display: flex; overflow-x: auto; scrollbar-width: none;
+  }
+  .section-nav-inner::-webkit-scrollbar { display: none; }
+  .section-nav a {
+    font-family: var(--mono); font-size: 0.72rem;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--ink-muted); text-decoration: none;
+    padding: 0.85rem 1.2rem;
+    border-bottom: 2px solid transparent; white-space: nowrap;
+    transition: color 0.2s, border-color 0.2s;
+  }
+  .section-nav a:hover { color: var(--ink); border-color: var(--seismic); }
+
+  /* ── Main ── */
+  .main { max-width: 860px; margin: 0 auto; padding: 0 2rem 6rem; }
+
+  .section {
+    padding: 4rem 0 1rem;
+    border-top: 1px solid var(--rule);
+    margin-top: 2rem;
+  }
+  .section:first-child { border-top: none; margin-top: 0; padding-top: 3.5rem; }
+
+  .section-label {
+    font-family: var(--mono); font-size: 0.7rem;
+    letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--seismic); margin-bottom: 0.8rem;
+  }
+  h2 {
+    font-family: var(--serif);
+    font-size: clamp(1.4rem, 3vw, 1.85rem);
+    font-weight: 700; line-height: 1.25;
+    margin-bottom: 1.4rem; color: var(--ink);
+  }
+  h3 {
+    font-family: var(--serif); font-size: 1.15rem;
+    font-weight: 700; margin: 2.2rem 0 0.7rem; color: var(--ink);
+  }
+  p { margin-bottom: 1.2rem; color: var(--ink-soft); }
+  strong { color: var(--ink); font-weight: 600; }
+
+  /* ── Pull quote ── */
+  .pull-quote {
+    border-left: 3px solid var(--seismic);
+    margin: 2rem 0; padding: 1.2rem 1.5rem;
+    background: var(--seismic-light);
+  }
+  .pull-quote p {
+    font-family: var(--serif); font-size: 1.05rem;
+    font-style: italic; color: var(--ink); margin: 0; line-height: 1.6;
+  }
+  .pull-quote cite {
+    display: block; font-family: var(--mono); font-size: 0.72rem;
+    color: var(--ink-muted); margin-top: 0.6rem; font-style: normal;
+  }
+
+  /* ── Stats ── */
+  .stat-row {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 1px; background: var(--rule);
+    border: 1px solid var(--rule); margin: 2rem 0;
+  }
+  .stat-cell { background: var(--paper); padding: 1.2rem 1.4rem; }
+  .stat-num {
+    font-family: var(--mono); font-size: 1.7rem;
+    font-weight: 600; color: var(--ink); line-height: 1; display: block;
+  }
+  .stat-num.red { color: var(--seismic); }
+  .stat-num.blue { color: var(--depth); }
+  .stat-num.orange { color: var(--injection); }
+  .stat-label {
+    font-family: var(--sans); font-size: 0.78rem;
+    color: var(--ink-muted); margin-top: 0.35rem; line-height: 1.3;
+  }
+
+  /* ── Figure ── */
+  .figure {
+    margin: 2.5rem 0;
+    border: 1px solid var(--rule);
+    background: #fff;
+  }
+  .figure img { width: 100%; display: block; }
+  .figure-caption {
+    padding: 0.9rem 1.1rem;
+    border-top: 1px solid var(--rule);
+    background: var(--paper-warm);
+  }
+  .figure-caption strong {
+    font-family: var(--mono); font-size: 0.72rem;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--depth); display: block; margin-bottom: 0.35rem;
+  }
+  .figure-caption p {
+    font-size: 0.85rem; color: var(--ink-soft);
+    margin: 0; line-height: 1.55;
+  }
+
+  /* ── Uncertainty box ── */
+  .uncertainty-box {
+    border: 1px solid var(--depth);
+    background: var(--depth-light);
+    padding: 1.5rem 1.6rem; margin: 2rem 0;
+  }
+  .uncertainty-box h4 {
+    font-family: var(--mono); font-size: 0.78rem;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--depth); margin-bottom: 0.7rem;
+  }
+  .uncertainty-box p {
+    font-size: 0.9rem; color: var(--ink-soft); margin-bottom: 0.6rem;
+  }
+  .uncertainty-box p:last-child { margin-bottom: 0; }
+
+  /* ── Compare strip ── */
+  .compare-strip {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 1px; background: var(--rule);
+    border: 1px solid var(--rule); margin: 2rem 0;
+  }
+  .compare-cell { background: var(--paper); padding: 1.3rem 1.4rem; }
+  .compare-cell.a { border-left: 3px solid var(--injection); }
+  .compare-cell.b { border-left: 3px solid var(--seismic); }
+  .compare-cell h5 {
+    font-family: var(--mono); font-size: 0.72rem;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--ink-muted); margin-bottom: 0.6rem;
+  }
+  .compare-cell p { font-size: 0.9rem; margin-bottom: 0; }
+  @media (max-width: 560px) { .compare-strip { grid-template-columns: 1fr; } }
+
+  /* ── Timeline ── */
+  .timeline { position: relative; padding-left: 2rem; margin: 2rem 0; }
+  .timeline::before {
+    content: ''; position: absolute; left: 6px; top: 0; bottom: 0;
+    width: 2px; background: var(--rule);
+  }
+  .tl-event { position: relative; margin-bottom: 1.6rem; }
+  .tl-event::before {
+    content: ''; position: absolute; left: -2rem; top: 0.4rem;
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--seismic); border: 2px solid var(--paper);
+    box-shadow: 0 0 0 1px var(--seismic);
+  }
+  .tl-event.blue::before { background: var(--depth); box-shadow: 0 0 0 1px var(--depth); }
+  .tl-event.orange::before { background: var(--injection); box-shadow: 0 0 0 1px var(--injection); }
+  .tl-year { font-family: var(--mono); font-size: 0.72rem; color: var(--ink-muted); margin-bottom: 0.2rem; letter-spacing: 0.08em; }
+  .tl-text { font-size: 0.92rem; color: var(--ink-soft); margin-bottom: 0; }
+  .tl-text strong { color: var(--ink); }
+
+  /* ── Pub card ── */
+  .pub-card {
+    border: 1px solid var(--rule); padding: 1.4rem 1.5rem;
+    margin: 1.2rem 0; background: #fff;
+    display: flex; gap: 1.2rem; align-items: flex-start;
+  }
+  .pub-year { font-family: var(--mono); font-size: 0.85rem; color: var(--seismic); font-weight: 600; min-width: 3rem; padding-top: 0.15rem; }
+  .pub-info h4 { font-family: var(--serif); font-size: 0.95rem; font-weight: 700; margin-bottom: 0.3rem; line-height: 1.35; }
+  .pub-info p { font-size: 0.82rem; color: var(--ink-muted); margin: 0; }
+  .pub-links { margin-top: 0.5rem; display: flex; gap: 0.8rem; }
+  .pub-links a {
+    font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--depth); text-decoration: none;
+    padding: 0.2rem 0.5rem; border: 1px solid var(--depth);
+    transition: background 0.15s, color 0.15s;
+  }
+  .pub-links a:hover { background: var(--depth); color: #fff; }
+
+  /* ── Footer ── */
+  footer {
+    background: var(--ink); color: rgba(247,246,242,0.55);
+    padding: 2.5rem 2rem; font-family: var(--mono);
+    font-size: 0.75rem; text-align: center; line-height: 1.8;
+  }
+  footer a { color: var(--seismic); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+
+  /* active research tab highlight */
+  .section-nav a.active { color: var(--ink); border-color: var(--seismic); }
+
+  /* ── Site nav ── */
+  nav:not(.section-nav) {
+    background: var(--ink);
+    padding: 0 2rem;
+    position: sticky;
+    top: 0;
+    z-index: 200;
+  }
+  .nav-inner {
+    max-width: 960px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+  }
+  .nav-links {
+    display: flex;
+    list-style: none;
+    gap: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .nav-links::-webkit-scrollbar { display: none; }
+  .nav-links li a {
+    display: block;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(247,246,242,0.55);
+    text-decoration: none;
+    padding: 1rem 1.1rem;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+    transition: color 0.2s, border-color 0.2s;
+  }
+  .nav-links li a:hover { color: rgba(247,246,242,0.9); }
+  .nav-links li a.active {
+    color: rgba(247,246,242,0.95);
+    border-bottom-color: var(--seismic);
+  }
+
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    text-decoration: none;
+    margin: 2rem 0 2.5rem;
+    transition: color 0.2s;
+  }
+  .back-link:hover { color: var(--ink); }
+</style>
+</head>
+<body>
+
+<!-- ══════ Site nav ══════ -->
+<nav>
+  <div class="nav-inner">
+    <ul class="nav-links">
+      <li><a href="index.html">About</a></li>
+      <li><a href="research.html" class="active">Research</a></li>
+      <li><a href="publications.html">Publications</a></li>
+      <li><a href="software.html">Software &amp; Catalogs</a></li>
+      <li><a href="teaching.html">Teaching</a></li>
+      <li><a href="cv.html">CV</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="hero-inner">
+    <div class="hero-eyebrow">Research · Induced Seismicity · Delaware Basin</div>
+    <h1>Tracing the <em>fault lines</em> of human activity beneath West Texas and Southeast New Mexico</h1>
+    <p class="hero-lead">When millions of barrels of wastewater go underground, the earth responds to pressure change, but where, at what depth, and why? A decade-long investigation into the earthquakes industrial activities are causing.</p>
+    <div class="hero-meta">
+      <div class="meta-item"><strong>Study Region</strong>Delaware Basin, TX/NM</div>
+      <div class="meta-item"><strong>Time Span</strong>2009 – 2022</div>
+      <div class="meta-item"><strong>Relocated Catalogs</strong>5,453 (TexNet, post-2017) + 73 (TexNet, pre-2017)</div>
+    </div>
+  </div>
+</header>
+
+<!-- ══════ Research sub-nav (tabs) ══════ -->
+<nav class="section-nav" aria-label="Research areas">
+  <div class="section-nav-inner">
+    <a href="research.html">Overview</a>
+    <a href="research-ml.html" class="tab-ml">ML for Seismology</a>
+    <a href="research-imaging.html"  class="tab-img">Crustal Imaging</a>
+    <a href="research-induced.html" class="active">Induced Seismicity</a>
+    <a href="research-groundmotion.html" class="tab-gm">Ground Motion</a>
+  </div>
+</nav>
+
+<main class="main">
+
+  <a class="back-link" href="research.html">← Research overview</a>
+
+  <!-- 1. The Beginning -->
+  <section class="section" id="beginning">
+    <div class="section-label">Origin</div>
+    <h2>An earthquake appeared in 2009. Then another. Then thousands.</h2>
+
+    <p>The Delaware Basin in west Texas had been quietly producing oil for decades when, around 2009, something changed. The first small tremors appeared near Pecos, barely felt, magnitude 1 or 2. But their timing was hard to ignore: they coincided with the beginning of large-scale <strong>saltwater disposal (SWD)</strong>, the practice of re-injecting the wastewater produced alongside oil deep into permeable rock formations.</p>
+
+    <p>By 2017, when the Texas Seismological Network (TexNet) came online to monitor induced events, as the increasing number of felt earthquakes had grown more alarming. Between 2017 and 2022, shallow saltwater disposal volumes in the study area nearly <strong>quadrupled</strong>. A fivefold surge in injection coincided with at least a sixfold increase in seismicity rate. The earthquake count followed the barrels.</p>
+
+    <div class="figure">
+      <img src="fig1.png">
+      <div class="figure-caption">
+        <strong>Figure 1. Temporal correlation between seismicity and injection.</strong>
+        <p>The increase in wastewater injection volumes coincided with a rise in earthquake activity in the southern Delaware Basin <a href="https://doi.org/10.1029/2024EA004027" target="_blank" rel="noopener">(Aziz Zanjani et al., 2025).</a></p>
+      </div>
+    </div>
+
+    <div class="timeline">
+      <div class="tl-event orange">
+        <div class="tl-year">2009</div>
+        <div class="tl-text">First catalogued seismicity detected by the regional TXAR array near Pecos. Injection is underway at modest volumes into the <strong>Delaware Mountain Group (DMG)</strong>, shallow, porous sandstone roughly 1 km below sea level.</div>
+      </div>
+      <div class="tl-event">
+        <div class="tl-year">2009 – 2016</div>
+        <div class="tl-text">These early events, recorded only by distant regional arrays, carry epicentral uncertainties of 10–15 km and depth errors exceeding 5 km. Relocation helped reduce those errors. Seismicity migrates slowly <strong>southeastward</strong>, tracking the expansion of injection wells and the thickening of high-permeability sandstone. </div>
+      </div>
+      <div class="tl-event">
+        <div class="tl-year">2015 – 2016</div>
+        <div class="tl-text">Hydraulic fracturing (HF) ramps up at depths &gt;2.5 km. A handful of events may be associated, but shallow SWD remains the dominant driver by both volume and spatial correlation.</div>
+      </div>
+      <div class="tl-event blue">
+        <div class="tl-year">2017</div>
+        <div class="tl-text">TexNet deploys a statewide seismic network. Real-time, dense monitoring becomes possible for the first time. Cumulative injection volumes begin a steep climb, up fourfold by 2022.</div>
+      </div>
+      <div class="tl-event">
+        <div class="tl-year">2019 – 2020</div>
+        <div class="tl-text">A spatial shift: seismic activity in the <strong>northern part of study area begins to wane</strong> while new fault systems in the <strong>southeast light up</strong>. The pattern suggests efficient pressure diffusion, not just local injection response.</div>
+      </div>
+      <div class="tl-event orange">
+        <div class="tl-year">2022</div>
+        <div class="tl-text">End of study period. Over 5,400 earthquakes have been relocated. Satellite InSAR data confirms the ground is slowly sinking (aseismic creep) along reactivated faults due to near-field pore pressure increase and far-field poroelastic stressing, overprinting the uplift signal otherwise expected from injection.</div>
+      </div>
+    </div>
+
+    <p>What began as an unexpected events became a scientific question of real consequence: <em>which faults are reactivating, at exactly what depth, and are they moving seismically, aseismically, or both?</em> The answers matter for hazard assessment, for regulatory decisions, and for understanding how the crust responds when humans alter its stress field at scale.</p>
+  </section>
+
+  <!-- 2. The Problem -->
+  <section class="section" id="problem">
+    <div class="section-label">The Challenge</div>
+    <h2>You cannot mitigate what you cannot locate, and locating small and shallow induced events is hard</h2>
+
+    <p>The central difficulty in studying induced seismicity in the Delaware Basin is not seismicity itself. It is <strong>depth</strong>. Whether an earthquake happened at 1 km depth or 4 km is not merely academic: it determines which geological unit failed, which fault system reactivated, and whether the trigger is shallow wastewater disposal or something deeper and harder to regulate.</p>
+
+    <p>Two layers sit at the heart of the story. The <strong>Delaware Mountain Group (DMG)</strong> and the underlying <strong>Bone Spring Formation (BSF)</strong> are the target shallow units for saltwater disposal, porous sandstones at roughly 0–2 km below mean sea level. The Wolfcamp Formation, the main oil production target, sits deeper at &gt;2.5 km. All SWD wells in the southern basin inject into the shallow units only. Knowing which layer is seismically active distinguishes an injection-triggered event from a production-triggered one.</p>
+
+    <div class="pull-quote">
+      <p>A shallow high-velocity Ochoan salt layer, sitting just 200–700 m above the DMG, creates a velocity discontinuity that standard 1-D seismic models handle poorly. Earthquakes can appear deeper than they truly are or shift laterally in the catalog, simply because the velocity model is too simple so the errors add up along station-to-event paths of 10-km or longer.</p>
+      <cite>— A well-known challenge in the basin, motivating the calibrated relocation approach used in both studies</cite>
+    </div>
+
+    <p>Before 2017, the only catalog available came from the <strong>TXAR array</strong>, regional stations 75–450 km away from the epicenters, recording predominantly P-waves. These gave useful directions and rough distances but yielded depth estimates with uncertainties commonly exceeding 5 km. Many events were assigned a default depth of zero. The pre-2017 seismic history of the southern Delaware Basin was, in a real sense, <em>unmapped</em>.</p>
+
+    <div class="stat-row">
+      <div class="stat-cell">
+        <span class="stat-num red">±10–15 km</span>
+        <div class="stat-label">Typical epicentral uncertainty, TXAR catalog pre-2017</div>
+      </div>
+      <div class="stat-cell">
+        <span class="stat-num blue">&lt;300 m</span>
+        <div class="stat-label">Epicentral uncertainty after HD relocation, post-2020 core cluster</div>
+      </div>
+      <div class="stat-cell">
+        <span class="stat-num orange">&gt;5 km</span>
+        <div class="stat-label">Depth uncertainty, typical TXAR events before relocation</div>
+      </div>
+      <div class="stat-cell">
+        <span class="stat-num blue">1.8 km</span>
+        <div class="stat-label">Mean depth error for TXAR events after HD relocation</div>
+      </div>
+    </div>
+
+    <p>After 2017, TexNet improved matters substantially, but not completely. In the early years, the network had sparse coverage in parts of the study area, and many events lacked a seismic station within the critical 10 km radius needed to resolve shallow hypocentral depths. The network geometry evolved year by year. The quality of locations is therefore a <em>function of time</em> as much as of the algorithm, and understanding that time-dependent uncertainty is itself one of the findings of this research.</p>
+  </section>
+
+  <!-- 3. The Method -->
+  <section class="section" id="method">
+    <div class="section-label">Methodology</div>
+    <h2>A virtual anchor in space and time: Hypocentroidal Decomposition</h2>
+
+    <p>The relocation strategy in both the pre-2017 and 2017–2022 analyses is the <strong>Hypocentroidal Decomposition (HD)</strong> algorithm, implemented through the open-source MLOC software (Bergman et al., 2023). Rather than locating each earthquake independently against an imperfect velocity model, all events are located <em>relative</em> to a virtual reference point, the <strong>Hypocentroid (HYP)</strong>, whose absolute position is pinned first using only the best-constrained, closest data.</p>
+    <div class="figure">
+      <img src="fig2.png">
+      <div class="figure-caption">
+        <strong>Figure 2. The evolving TexNet network in southern Delaware Basin and the schematic of Hypocentroidal Decomposition Method.</strong>
+        <p> The evolving TexNet network in southern Delaware Basin with stations color-coded by the year they were deployed. The schematic of Hypocentroidal Decomposition Algorithm. Single-event location: station-to-event ray paths (red) traverse a large velocity model volume (blue), accumulating model errors. The HYP is the anchor virtual location. HD multiple-event relocation: a core cluster of well-recorded events defines the HYP within a drastically <em>shrunken</em> model space (red), minimizing velocity-model bias
+        <a href="https://doi.org/10.1785/0320240011" target="_blank" rel="noopener">(Aziz Zanjani et al., 2024).</a></p>
+      </div>
+    </div>
+
+    <p>In practice, this works through two nested inversions. A carefully chosen <strong>core cluster</strong>, for the TexNet study, 150 post-2020 earthquakes with strong azimuthal coverage and at least one station within 10 km, pins the HYP with sub-kilometer precision. Every other event then relocates relative to it via differential travel times, sidestepping the need for each individual earthquake to resolve the full Earth structure independently.</p>
+
+    <p>A further refinement addresses depth specifically. The <strong>S−P phase time difference</strong>, the gap between shear and compressional wave arrivals at a nearby station, is a powerful depth constraint. In the 2017–2022 study, 5,147 S−P differential times were added for stations within 10 km, substantially tightening depth estimates for shallow events. For the pre-2017 TXAR work, 290 S−P times from the core cluster and cross-correlation differential times at the co-located TX31 station performed the same function, anchoring events recorded by distant arrays to the locally-calibrated reference.</p>
+
+    <div class="uncertainty-box">
+      <h4>Why S–P Times Are Non-Negotiable for Depth</h4>
+      <p>For a shallow earthquake (&lt;2 km depth), the S−P time at a nearby station (&lt;10 km) changes rapidly with depth, a 500 m error in depth corresponds to a measurable change in the differential arrival time. At distant stations (&gt;50 km), this depth sensitivity disappears entirely; the S−P time is dominated by the horizontal travel path, not the source depth. This is why the rule of thumb, nearest station within 1–2 times the source depth, is not a guideline. It is a geometric necessity. Violating it guarantees systematically biased depths, and this is precisely what plagued the original TXAR catalog.</p>
+      <p>The HD algorithm also iteratively computes <strong>Empirical Reading Errors (EREs)</strong> for each station–phase pair, quantifying residual scatter and flagging outliers. By the end of calibration, every station–phase pair converges to a normal residual distribution, not just a best-fit location, but a rigorously characterized one. The resulting catalog carries honest, quantified uncertainties built into the method itself.</p>
+    </div>
+
+    <p>For the pre-2017 study, the same HD framework bridges a seven-year gap in network architecture. The post-2020 TexNet core cluster serves as the absolute anchor; TXAR events are connected to it via shared regional stations. This joint inversion links pre- and post-2017 seismicity into a single spatial reference frame, making direct comparison of hypocenter distributions across the two eras meaningful for the first time.</p>
+  </section>
+
+  <!-- 4. Uncertainty -->
+  <section class="section" id="uncertainty">
+    <div class="section-label">Uncertainty as a Result</div>
+    <h2>The error bars are not a footnote, they are part of the finding</h2>
+
+    <p>Most seismicity studies treat location uncertainties as a necessary evil: reported in supplementary tables, minimized in prose. This work takes a different stance. The <strong>spatial and temporal patterns of uncertainty are themselves informative</strong>. They encode the history of a seismic network installed progressively, with dramatically different coverage in 2017 compared to 2022, and they warn against over-interpreting the early catalog.</p>
+
+    <div class="figure">
+      <img src="fig3.png">
+      <div class="figure-caption">
+        <strong>Figure 3. Relocation results and quantified uncertainties.</strong>
+        <p>Temporal changes in relative errors with evolving network (the absolute error is the sum of the relative error and the error from HYP), the effect of azimuthal coverage, the larger depth variations. Depth error plots are against nearest station distance. Red solid lines define 1-2 times rule of thumb, for depth value to be constrained, the station should be 1-2 times within hypocenter. All deeper events are pre-2020 earthquakes with larger depth errors
+        <a href="https://doi.org/10.1029/2024EA004027" target="_blank" rel="noopener">(Aziz Zanjani et al., 2025).</a></p>
+        </div>
+    </div>
+
+    <div class="figure">
+      <img src="fig4.png">
+      <div class="figure-caption">
+        <strong>Figure 4. Temporal change in depth distribution as TexNet expanded in time. </strong>
+        <p>Post-2020 earthquakes have shallower and tighter depth distribution and have best-resolved depth (Fig. 3)
+        <a href="https://doi.org/10.1029/2024EA004027" target="_blank" rel="noopener">(Aziz Zanjani et al., 2025).</a></p>
+      </div>
+    </div>
+
+    <p>Three systematic patterns emerge. First, <strong>pre-2020 events carry larger errors than post-2020 events</strong>, not because they were smaller or harder to detect, but because the network was sparser. Second, pre-2020 events also appear systematically <em>deeper</em> in the original catalogs. This is a red flag: the apparent deepening corresponds precisely to the situation where the nearest station is too far away for robust depth resolution. Third, azimuthal gap correlates tightly with epicentral error area, events at the outskirts of the study area, where station coverage is thinnest, carry the largest uncertainties.</p>
+    <p>The HD approach produces systematically shallower solutions aligning more closely with the known injection depths. The difference between 1 km and 2 km is the difference between the DMG and the top of the Bone Spring Formation, a geologically meaningful distinction for identifying the triggering unit.</p>
+  </section>
+
+  <!-- 5. Findings -->
+  <section class="section" id="findings">
+    <div class="section-label">Core Results</div>
+    <h2>Pressure traveling southeast: a decade of fault reactivation mapped</h2>
+
+    <p>With calibrated locations in hand, the spatial and temporal story of seismicity in the southern Delaware Basin comes into focus. It is not a static picture of faults uniformly responding to injection. It is a dynamic, evolving system in which pressure diffuses, faults reactivate and then quiet down, and new fault segments emerge as the injection footprint expands.</p>
+
+    <div class="stat-row">
+      <div class="stat-cell">
+        <span class="stat-num red">1.5 km</span>
+        <div class="stat-label">Mean seismogenic depth below MSL, within the DMG/BSF SWD interval</div>
+      </div>
+      <div class="stat-cell">
+        <span class="stat-num blue">&gt;80%</span>
+        <div class="stat-label">Post-2020 events within the shallow SWD depth interval</div>
+      </div>
+      <div class="stat-cell">
+        <span class="stat-num orange">4×</span>
+        <div class="stat-label">Increase in cumulative shallow SWD volumes, 2017 to 2022</div>
+      </div>
+      <div class="stat-cell">
+        <span class="stat-num red">29</span>
+        <div class="stat-label">Active seismic lineaments (reactivated fault segments) identified by 2022</div>
+      </div>
+    </div>
+
+    <h3>The pre-2017 chapter: the same faults, earlier</h3>
+
+    <p>The TXAR relocation work establishes that the same northwest-trending shallow normal faults active in the post-2017 catalog were already reactivating as far back as 2009. Almost all 73 relocated pre-2017 events sit on the same fault lineaments identified from post-2017 seismicity, with one exception (cluster 1 in the 2009–2010 panel), the spatial overlap is striking. The faults being triggered today are the same ones that first moved more than a decade ago.</p>
+
+    <div class="figure">
+      <img src="fig5.png">
+      <div class="figure-caption">
+        <strong>Figure 5. Pre-2017 seismicity, injection correlation, and depth distributions.</strong>
+        <p> Maps of the 73 relocated TXAR events (stars, colored by year) against smoothed cumulative injection volumes (background) in two-year increments, overlaid on active seismic lineaments from post-2017 seismicity (red lines). In 2009–2010, clusters 1–3 occur 5–20 km from the earliest injection hotspots. By 2015–2016, seismicity has migrated southeast along expansion of injection. Initial depth histograms: TXAR events are centered at 0 km (default assignment) and widely scattered; TexNet events are more focused. After HD relocation: both catalogs shift to ~1 km below MSL, aligned with the SWD injection depth in panel. After relocation, the depth distribution matches shallow injection depth distribution in the study area 
+        <a href="https://doi.org/10.1785/0320240011" target="_blank" rel="noopener">(Aziz Zanjani et al., 2024).</a></p>
+      </div>
+    </div>
+
+    <div class="compare-strip">
+      <div class="compare-cell a">
+        <h5>TXAR Catalog — Before Relocation</h5>
+        <p>Mean depth heavily biased. Epicentral uncertainties 10–15 km. The catalog is barely interpretable for spatial or depth analysis.</p>
+      </div>
+      <div class="compare-cell b">
+        <h5>After HD Relocation</h5>
+        <p>When tied to post-2020 seismicity, mean depth shifts to 1 km below MSL, matching the known SWD injection interval. 88% shallower than 2 km. Error areas 3–6× smaller. The same faults visible in post-2017 seismicity are now visible going back to 2009.</p>
+      </div>
+    </div>
+    <p>This matters enormously for physical interpretation. If one takes the full pre-2017 catalog at face value, the data seem to show earthquakes spanning a wide depth range, potentially implicating deep basement faults or the Wolfcamp production interval. The calibrated analysis shows that this broad distribution collapses: the majority of well-resolved seismicity sits squarely within the shallow SWD depth interval. The deep events largely disappear when uncertainty is accounted for properly.</p>
+    <h3>The northwest trend and the southeast migration</h3>
+
+    <p>The clearest structural signal in both catalogs is the prevalence of <strong>northwest-trending seismic lineaments</strong>: linear strings of earthquakes mapping directly onto shallow normal faults in the DMG. These faults are optimally oriented for reactivation by the regional stress field, in which maximum horizontal compression points northwest. At 71% of fault length, a pore pressure increase of just 2.5 MPa is enough to push them toward failure, and SWD-driven pressure changes in this range are documented across the basin.</p>
+
+    <p>But the pattern is not stationary. In 2009–2010, seismicity clusters in the north, 5–20 km from the earliest high-volume injection wells (A and B). By 2013–2016, the locus has shifted: new clusters (8–14) emerge near injection locations C, D, and E to the southeast. Then, from 2017 onward, the same migration accelerates: northern fault systems quiet down as southeastern ones activate and lengthen.</p>
+
+    <div class="pull-quote">
+      <p>The southeast shift in the loci of seismicity spatially correlates with porosity and permeability changes in the subsurface, indicating heightened fluid capacity and effective pressure diffusion along highly porous and permeable sandstone within the Delaware Mountain Group. Pressure does not diffuse uniformly. It follows the geology.</p>
+      <cite>— Aziz Zanjani et al. (2024), The Seismic Record</cite>
+    </div>
+
+    <p>This directional preference has a geological explanation. Smye et al. (2021) document that the DMG sandstone <strong>thickens toward the southeast</strong>, coinciding with pre-existing strata-bound fault trends and fracture corridors that act as anisotropic conduits for pressure migration. Sensitivity analyses (Ge et al., 2022) show that pressure build-up in these units is sensitive to horizontal permeability and compressibility, the system is structured to move pressure southeast. The seismicity simply follows.</p>
+
+    <h3>The 2017–2022 chapter: a denser, more complete picture</h3>
+
+    <p>With 5,453 relocated earthquakes over six years, the TexNet catalog provides far higher spatial resolution. The study area was divided into four overlapping quadrants (NW, NE, SW, SE), each with its own independently-constrained HYP. By 2020–2022, after TexNet had expanded substantially, over 95% of events locate shallower than 2 km below MSL with depth errors less than 1 km. The mean seismogenic depth of 1.5 km below MSL is consistent across both the pre-2017 and post-2017 catalogs, confirming that the same shallow fault system has been continuously reactivating for over a decade.</p>
+
+    <div class="figure">
+      <img src="fig6.png">
+      <div class="figure-caption">
+        <strong>Figure 6. Temporal evolution of M2+ seismicity and saltwater disposal, 2017–2022.</strong>
+        <p>Left panels: 2017–2019, showing injection hotspots (background color, Kriging-interpolated SWD volumes) and earthquake locations (circles, depth-coded) with interpreted seismic lineaments (L1–L23, dashed green). Before 2020, most active lineaments occur in or near low-volume injection zones, suggesting far-field stress transfer is already operative. Right panels: 2020–2022. Seismicity reorganizes southeastward, new lineaments L24–L29 emerge adjacent to expanding SWD hotspots. The kernel density maps (lower panels) make the spatial shift unmistakable: the northwest is dimming; the southeast is brightening 
+        <a href="https://doi.org/10.1029/2024EA004027" target="_blank" rel="noopener">(Aziz Zanjani et al., 2025).</a></p>
+      </div>
+    </div>
+
+    <p>A notable feature of the post-2020 catalog is <strong>fault-to-fault stress interaction</strong>. Newer seismic lineaments (L26–L29) develop preferentially adjacent to the longest previously-active faults (L15, L20) rather than at random locations within the injection field. This reflects a cascade of stress redistribution: primary rupture transfers stress to neighboring fault segments, triggering slip that may extend well beyond the zone of direct pore pressure perturbation.</p>
+  </section>
+
+  <!-- 6. Ground Deformation -->
+  <section class="section" id="deformation">
+    <div class="section-label">Surface Deformation</div>
+    <h2>Creeping faults: when subsidence overprints expected uplift and seismicity tells only part of the story</h2>
+
+    <p>InSAR satellite radar provides a complementary view. Sentinel-1 persistent scatterer data (StaMPS processing) shows the southern Delaware Basin subsiding at <strong>3–4 cm per year</strong> over 2016–2022. But the deformation is not a simple bowl, it is a superposition of at least three distinct signals with different spatial character and different causes.</p>
+
+    <p><strong>Long-wavelength (10–50 km) radially symmetric subsidence</strong> reflects volumetric depletion during hydrocarbon production. These signals are largely aseismic where they do not coincide with injection hotspots, production compacts the reservoir, the surface sinks, but faults are not pushed to failure.</p>
+
+    <p><strong>Short-wavelength (3–5 km) linear subsidence</strong> tells a different story. These narrow, elongated lobes align precisely with the seismic lineaments: reactivated normal faults in the DMG. The spatial spacing of subsidence features (less than 5 km) mirrors the spacing of the seismic lineaments themselves. This is concurrent seismic and aseismic slip on the same fault surfaces. And critically, the total deformation amplitude requires a substantial <em>aseismic</em> component. Pepin et al. (2022) estimate that only 2% of the deformation caused by shallow SWD is seismic. Our regional data confirm this at scale: aseismic slip is the dominant mode; seismic slip is the visible signal.</p>
+
+    <div class="figure">
+      <img src="fig7.png">
+      <div class="figure-caption">
+        <strong>Figure 7. InSAR-derived surface deformation and seismic lineaments, 2016–2022.</strong>
+        <p>Blue = subsidence; red = uplift. Solid green lines are seismic lineaments interpreted from relocated seismicity (l1–l15). The correspondence between narrow linear subsidence signals and seismic lineaments directly documents concurrent seismic and aseismic slip on reactivated normal faults in the DMG and BSF. Cross-sections A–A′ through D–D′ compare deformation profiles at 3 years (2016–2018) and 7 years (2016–2022), revealing temporal acceleration at several sites (S6, S7, S9, S10, S14) beginning around 2019. Broad, radially symmetric subsidence in the northwest (S4–S7) reflects production-related compaction without fault reactivation. Uplifted regions (U3–U9, shrinking after 2020) sit in areas of minimal injection and no seismicity 
+        <a href="https://doi.org/10.1029/2024EA004027" target="_blank" rel="noopener">(Aziz Zanjani et al., 2025).</a></p>
+      </div>
+    </div>
+    <div class="uncertainty-box">
+      <h4>What Uplift Tells Us</h4>
+      <p>Several regions show net uplift rather than subsidence, areas with little or no injection and no seismicity, sitting between the subsidence zones. The interpretation: in these locations, SWD-driven pore pressure increase slightly exceeds production-related compaction. The crust is being pushed up. This spatial mosaic of uplift, subsidence, and fault slip between, reflects the <strong>inhomogeneous and time-variant stress regime</strong> created when injection and production operate concurrently across a geologically complex basin. It is also what makes seismic hazard assessment here genuinely difficult: the stress state is not static, it is evolving, and different parts of the fault network are at different stages of that evolution at any given moment.</p>
+    </div>
+  </section>
+
+  <!-- 7. Implications -->
+  <section class="section" id="implications">
+    <div class="section-label">Broader Significance</div>
+    <h2>What this means for monitoring, mitigation, and understanding</h2>
+
+    <p>Several results from this work carry implications beyond the Delaware Basin. First: <strong>depth matters, and it is hard to get right</strong>. The systematic overestimation of hypocentral depths in early TexNet and pre-2017 TXAR catalogs has real consequences for physical interpretation and for regulation. Policies and models built on uncorrected catalogs could misidentify the faulting intervals being reactivated. The relocation work here provides a corrected foundation, but also a methodological warning: relocated catalogs anchored only to differential times without an absolute reference can inherit and propagate the biases of the initial catalog.</p>
+
+    <p>Second, <strong>aseismic slip is not a background process</strong>, it is pervasive, dominant, and linked to the same fault zones that occasionally produce felt earthquakes. This has direct regulatory implications: an operator watching injection-induced seismicity rates may be seeing only the 2% of fault deformation that is seismic. The 98% that is aseismic, equally relevant to ground stability, wellbore integrity, and long-term fault evolution, requires geodetic monitoring (InSAR, GPS) to detect at all.</p>
+
+    <p>Third, the <strong>southeastward migration of seismicity tracks fault permeability and stratigraphic connectivity</strong> as much as it tracks injection well locations. Models that route pressure isotropically from injection wells will miss the preferential southeast pathways documented here. Effective mitigation in this basin requires understanding not just where the wells are, but where the permeable sandstone thickens and where the fault corridors align.</p>
+
+    <p>Finally, this work establishes that the southern Delaware Basin has been responding to saltwater disposal continuously since at least 2009, well before TexNet was deployed, and well before the current scale of operations was reached. The faults reactivating today are the same ones that first moved fifteen years ago. Understanding the long-term stress accumulation on these structures, and what happens as injection volumes eventually decline or are redistributed geographically, is the open question that this decade of relocated earthquakes is now in a position to help answer.</p>
+    <p>With lessons learned in southern Delaware, I am now focusing on induced seismicity in northern Delaware Basin (southeast NM). Incorporating machine learning, I am trying to build more complete catalogs that can inform regulatory decisions in NM.</p>
+  </section>
+
+  <!-- 8. Publications -->
+  <section class="section" id="publications">
+    <div class="section-label">Publications</div>
+    <h2>Research outputs</h2>
+
+    <div class="pub-card">
+      <div class="pub-year">2025</div>
+      <div class="pub-info">
+        <h4>Insights into Spatiotemporal Evolution of Induced Earthquakes in the Southern Delaware Basin Using Calibrated Relocations from the TexNet Catalog (2017–2022)</h4>
+        <p>Aziz Zanjani, A., DeShon, H. R., Karanam, V., &amp; Savvaidis, A. — <em>Earth and Space Science</em>, 12, e2024EA004027</p>
+        <div class="pub-links">
+          <a href="https://doi.org/10.1029/2024EA004027" target="_blank" rel="noopener">DOI</a>
+          <a href="https://doi.org/10.5281/zenodo.13993061" target="_blank" rel="noopener">Data</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="pub-card">
+      <div class="pub-year">2024</div>
+      <div class="pub-info">
+        <h4>Insights into Temporal Evolution of Induced Earthquakes in the Southern Delaware Basin Using Calibrated Relocations from the TXAR Catalog (2009–2016)</h4>
+        <p>Aziz Zanjani, A., DeShon, H. R., Karanam, V., &amp; Savvaidis, A. — <em>The Seismic Record</em>, 4(2), 140–150</p>
+        <div class="pub-links">
+          <a href="https://doi.org/10.1785/0320240011" target="_blank" rel="noopener">DOI</a>
+          <a href="https://doi.org/10.5281/zenodo.13953115" target="_blank" rel="noopener">Data</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8. Publications -->
+  <section class="section" id="Resources">
+    <div class="resource-links">
+      <a class="paper-link" href="https://seismo.com/mloc/" target="_blank">↗ MLOC package</a>
+      <a class="paper-link" href="https://academic.oup.com/gji/article/195/2/799/650385" target="_blank">↗ Aziz Zanjani et al. (2013)</a>
+      <a class="paper-link" href="https://www.dallasnews.com/news/2024/08/20/earthquakes-before-2017-tied-to-oil-and-gas-wastewater-scientists-at-smu-find/" target="_blank">↗ Dallas Morning News</a>
+      <a class="paper-link" href="https://www.smu.edu/news/research/texas-seismic-activity-and-wastewater-injection" target="_blank">↗ SMU News</a>
+  </section>
+</main>
+
+<!-- ══════ Site footer — from style.css ══════ -->
+<footer>
+  <div class="footer-inner">
+    <p>&copy; 2026 Asiye Aziz Zanjani, Ph.D.</p>
+    <div class="footer-icons">
+      <a href="https://scholar.google.com/citations?user=vzA30FwAAAAJ&hl=en&oi=sra"
+         target="_blank" rel="noopener noreferrer">Scholar</a>
+      <a href="https://www.researchgate.net/profile/Asiye-Aziz-Zanjani"
+         target="_blank" rel="noopener noreferrer">ResearchGate</a>
+      <a href="https://www.linkedin.com/in/asiye-aziz-zanjani-1232ab59/"
+         target="_blank" rel="noopener noreferrer">LinkedIn</a>
+      <a href="https://github.com/Asiye-Aziz-Zanjani"
+         target="_blank" rel="noopener noreferrer">GitHub</a>
+      <a href="https://orcid.org/0000-0003-3344-9720"
+         target="_blank" rel="noopener noreferrer">ORCID</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

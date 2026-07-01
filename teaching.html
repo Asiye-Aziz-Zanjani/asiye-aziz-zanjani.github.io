@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Teaching — Asiye Aziz Zanjani</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,600;1,400&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink:        #1a1a1e;
+      --ink-soft:   #3d3d45;
+      --ink-muted:  #7a7a88;
+      --paper:      #f7f6f2;
+      --paper-warm: #eeede8;
+      --seismic:    #c0392b;
+      --depth:      #1a4b7a;
+      --depth-lt:   #d0e0f0;
+      --teal:       #1a6b6b;
+      --violet:     #5b3a8c;
+      --amber:      #b05c10;
+      --rule:       #d4d2cc;
+      --mono:  'IBM Plex Mono', monospace;
+      --serif: 'Libre Baskerville', Georgia, serif;
+      --sans:  'Inter', system-ui, sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--sans);
+      font-size: 17px;
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .page-body {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 0 2rem 5rem;
+    }
+
+    .section-block {
+      padding: 3.5rem 0 1rem;
+      border-top: 1px solid var(--rule);
+      margin-top: 1rem;
+    }
+    .section-block:first-child { border-top: none; padding-top: 3rem; }
+
+    .section-eyebrow {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+      margin-bottom: 0.7rem;
+    }
+    .section-block h2 {
+      font-family: var(--serif);
+      font-size: clamp(1.3rem, 2.5vw, 1.6rem);
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 1.8rem;
+      line-height: 1.25;
+    }
+
+    /* Course cards */
+    .course-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      background: var(--rule);
+      border: 1px solid var(--rule);
+    }
+    .course-item {
+      background: var(--paper);
+      padding: 1.5rem 1.75rem;
+      position: relative;
+      transition: background 0.15s;
+    }
+    .course-item::before {
+      content: '';
+      display: block;
+      height: 100%;
+      width: 3px;
+      position: absolute;
+      top: 0; left: 0; bottom: 0;
+      background: var(--rule);
+      transition: background 0.15s;
+    }
+    .course-item:hover { background: var(--paper-warm); }
+    .course-item:hover::before { background: var(--violet); }
+    .course-item h3 {
+      font-family: var(--serif);
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 0.2rem;
+    }
+    .course-meta {
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.06em;
+      color: var(--ink-muted);
+      margin-bottom: 0.6rem;
+    }
+    .course-item p {
+      font-size: 0.9rem;
+      color: var(--ink-soft);
+      line-height: 1.7;
+      margin: 0;
+    }
+
+    /* TA list */
+    .institution-label {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.09em;
+      color: var(--ink-muted);
+      margin-bottom: 1rem;
+    }
+    .ta-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+    .ta-item {
+      font-size: 0.9rem;
+      color: var(--ink-soft);
+      padding: 0.75rem 0;
+      border-bottom: 1px solid var(--rule);
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 1rem;
+      align-items: baseline;
+      line-height: 1.55;
+    }
+    .ta-item:last-child { border-bottom: none; }
+    .ta-term {
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.06em;
+      color: var(--ink-muted);
+      white-space: nowrap;
+    }
+
+    /* Mentoring */
+    .mentoring-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+    .mentee-item {
+      display: grid;
+      grid-template-columns: 180px 1fr;
+      gap: 0 1.5rem;
+      align-items: start;
+      padding: 1.25rem 0;
+      border-bottom: 1px solid var(--rule);
+    }
+    .mentee-item:last-child { border-bottom: none; }
+    .mentee-meta {}
+    .mentee-role {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--teal);
+      font-weight: 600;
+      display: block;
+      margin-bottom: 0.2rem;
+      line-height: 1.5;
+    }
+    .mentee-item h3 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--ink);
+      margin: 0;
+    }
+    .mentee-item p {
+      font-size: 0.88rem;
+      color: var(--ink-soft);
+      line-height: 1.65;
+      margin: 0;
+    }
+
+    /* Development */
+    .dev-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+    .dev-item {
+      font-size: 0.9rem;
+      color: var(--ink-soft);
+      padding: 0.9rem 0;
+      border-bottom: 1px solid var(--rule);
+      line-height: 1.65;
+      padding-left: 1.25rem;
+      position: relative;
+    }
+    .dev-item:last-child { border-bottom: none; }
+    .dev-item a {
+      color: var(--depth);
+      text-decoration: none;
+      border-bottom: 1px solid var(--depth-lt);
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .dev-item a:hover { color: var(--ink); border-color: var(--ink); }
+    .dev-item::before {
+      content: '—';
+      position: absolute;
+      left: 0;
+      color: var(--ink-muted);
+      font-family: var(--mono);
+      font-size: 0.8rem;
+    }
+
+    @media (max-width: 640px) {
+      .mentee-item { grid-template-columns: 1fr; gap: 0.5rem; }
+      .ta-item { grid-template-columns: 1fr; gap: 0.2rem; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <ul class="nav-links">
+      <li><a href="index.html">About</a></li>
+      <li><a href="research.html">Research</a></li>
+      <li><a href="publications.html">Publications</a></li>
+      <li><a href="software.html">Software &amp; Catalogs</a></li>
+      <li><a href="teaching.html" class="active">Teaching</a></li>
+      <li><a href="cv.html">CV</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+  </div>
+</nav>
+
+<div class="page-body">
+
+  <div class="section-block">
+    <div class="section-eyebrow">Teaching</div>
+    <h2>Teaching Experience &amp; Mentoring</h2>
+  </div>
+
+  <div class="section-block">
+    <div class="section-eyebrow">Instructor of Record</div>
+    <h2>Courses Taught</h2>
+    <ul class="course-list">
+      <li class="course-item">
+        <h3>Earth Systems</h3>
+        <p class="course-meta">Adjunct Lecturer · Southern Methodist University · Undergraduate · 72 students · Fall 2023</p>
+        <p>Canvas-based Course Development. Developed inclusive, active-learning curriculum and course material incorporating real-world applications and case studies. Designed hands-on exercises with student presentations on anthropogenic impacts in Earth Systems.</p>
+      </li>
+      <li class="course-item">
+        <h3>Introduction to Geophysics</h3>
+        <p class="course-meta">Lecturer · University of Zanjan, Iran · Undergraduate · 28 students · Fall 2012</p>
+      </li>
+    </ul>
+  </div>
+
+  <div class="section-block">
+    <div class="section-eyebrow">Teaching Assistant</div>
+    <h2>Assisted Courses</h2>
+    <p class="institution-label">Saint Louis University</p>
+    <ul class="ta-list">
+      <li class="ta-item">
+        <span>Sustainable Energy — Undergraduate</span>
+        <span class="ta-term">Fall 2017 &amp; 2018</span>
+      </li>
+      <li class="ta-item">
+        <span>Is Earth Unique? — Undergraduate</span>
+        <span class="ta-term">Spring 2016</span>
+      </li>
+      <li class="ta-item">
+        <span>Earth's Dynamic Environment — Undergraduate</span>
+        <span class="ta-term">Fall 2015 &amp; 2016</span>
+      </li>
+    </ul>
+  </div>
+
+  <div class="section-block">
+    <div class="section-eyebrow">Mentoring</div>
+    <h2>Student Mentoring</h2>
+    <ul class="mentoring-list">
+      <li class="mentee-item">
+        <div class="mentee-meta">
+          <span class="mentee-role">Summer Intern Mentor<br>EarthScope RESESS Program 2026</span>
+        </div>
+        <div>
+          <h3>Nathan Wolski</h3>
+          <p>Geology major, University of Illinois Urbana-Champaign. Ambient noise tomography; bash scripting on Linux. Will present at AGU 2026, San Francisco, CA.</p>
+        </div>
+      </li>
+      <li class="mentee-item">
+        <div class="mentee-meta">
+          <span class="mentee-role">Graduate Co-mentor<br>2024–2025</span>
+        </div>
+        <div>
+          <h3>Omid Asgarvand</h3>
+          <p>PhD candidate, Southern Methodist University. Machine learning for developing seismic catalogs using OBS and land data. Presented at SSA 2026, Pasadena, CA.</p>
+        </div>
+      </li>
+      <li class="mentee-item">
+        <div class="mentee-meta">
+          <span class="mentee-role">Undergraduate Co-mentor<br>IRIS Summer Intern 2022</span>
+        </div>
+        <div>
+          <h3>Chris Justiniano</h3>
+          <p>Machine learning-based seismic catalog development. Presented at AGU Fall Meeting 2022, Chicago, IL.</p>
+        </div>
+      </li>
+    </ul>
+  </div>
+
+  <div class="section-block">
+    <div class="section-eyebrow">Development</div>
+    <h2>Professional Teaching Development</h2>
+    <ul class="dev-list">
+      <li class="dev-item">Teaching near-surface geophysics workshop (GPR, GPS, ERT, and seismic refraction), EarthScope Consortium, Colorado School of Mines (2026).</li>
+      <li class="dev-item"><a href="teaching-certificate.pdf" target="_blank">Certificate in University Teaching Skills</a>, Reinert Center for Transformative Teaching and Learning, Saint Louis University (2019), 15 credits including workshops, online courses, and teaching portfolio.</li>
+      <li class="dev-item">Canvas Onsite Training, Reinert Center, Saint Louis University (2021).</li>
+      <li class="dev-item">Comprehensive Canvas Training Series, Southern Methodist University (2023).</li>
+    </ul>
+  </div>
+
+  <div class="narrative-section" id="resource">
+    <div class="resource-links">Useful Resources  &amp Links</div>
+      <a class="paper-link" href="https://serc.carleton.edu/getsi/index.html#field" target="_blank" >↗ GETSI</a>
+      <a class="paper-link" href="https://github.com/seisbench/seisbench/blob/main/examples/03d_catalog_seisbench_pyocto.ipynb" target="_blank" >↗ SeisBench Examples</a>
+      <a class="paper-link" href="https://github.com/AI4EPS" target="_blank" >↗ AI4EPS</a>
+      <a class="paper-link" href="https://scads.github.io/ai4seismology-2025/intro.html" target="_blank" >↗ ScaDS.AI</a>
+      <a class="paper-link" href="https://seisscoped.org/HPS-book/chapters/quake_catalog/MLworkflow_quakeflow.html#scoped-tutorial-for-ml-catalog-construction" target="_blank" >↗ High Performance Seismology</a>
+      <a class="paper-link" href="https://www.youtube.com/@scoped6259/featured" target="_blank" >↗ SCOPED youtube</a>
+      <a class="paper-link" href="https://www.eas.slu.edu/eqc/eqc_mt/MECH.NA/" target="_blank" >↗ SLU Moment Tensors</a>
+      <a class="paper-link" href="https://www.mspass.org" target="_blank" >↗ MsPASS</a>
+      <a class="paper-link" href="https://seismicsoundlab.org/units/human-induced-seismicity/" target="_blank" >↗ Seismicsoundlab</a>
+      <a class="paper-link" href="https://seissol.org/" target="_blank" >↗ SeisSol</a>
+      <a class="paper-link" href="https://www.youtube.com/playlist?list=PL0QkIuRniw9Pdrp7K9cnGYnt76cbAaiLB" target="_blank" >↗ SZ4D International Seminar Series</a>
+      <a class="paper-link" href="https://www.iris.edu/hq/inclass/course/roses" target="_blank" >↗ IRIS Remote Online Sessions</a>
+      <a class="paper-link" href="https://ds.iris.edu/mda/_IMAD/" target="_blank" >↗ IRIS Available Networks</a>
+      <a class="paper-link" href="https://service.earthscope.org/fdsnws/station/1/query?level=network&nodata=404&format=text" target="_blank" >↗ IRIS Network List</a>
+      <a class="paper-link" href="https://ds.iris.edu/gmap/#network=3A&planet=earth" target="_blank" >↗ IRIS Network Searcg</a>
+      <a class="paper-link" href="https://seg.org/events/" target="_blank" >↗ SEG</a>
+      <a class="paper-link" href="https://www.seismosoc.org" target="_blank" >↗ SSA</a>
+      <a class="paper-link" href="https://www.agu.org" target="_blank" >↗ AGU</a>
+      <a class="paper-link" href="https://www.usgs.gov" target="_blank" >↗ USGS</a>
+      <a class="paper-link" href="https://www.ncei.noaa.gov/productsv" target="_blank" >↗ NCEI NOAA Products</a>
+      <a class="paper-link" href="https://www.gebco.net/data-products/gridded-bathymetry-data" target="_blank" >↗ GEBCO Gridded Bathymetry Data</a>
+      <a class="paper-link" href="https://www.geomapapp.org" target="_blank" >↗ GEOMAP</a>
+      <a class="paper-link" href="https://www.marine-geo.org/tools/new_search/search_map.php" target="_blank" >↗ MGDS</a>
+      <a class="paper-link" href="https://www.unavco.org" target="_blank" >↗ UNAVCO</a>
+      <a class="paper-link" href="https://www.earthscope.org/" target="_blank" >↗ EarthScope</a>
+      <a class="paper-link" href="https://srtm.csi.cgiar.org/srtmdata/" target="_blank" >↗ SRTM</a>
+      <a class="paper-link" href="https://github.com/GEMScienceTools" target="_blank" >↗ GEM Science Tools</a>
+      <a class="paper-link" href="https://github.com/geoscience-community-codes"  target="_blank" >↗ GeoScience Community Codes</a>
+      <a class="paper-link" href="https://www.iris.edu/hq/initiatives/das_rcn"  target="_blank" >↗ DAS RCN</a>
+  </div>
+
+<footer>
+  <div class="footer-inner">
+    <p>&copy; 2026 Asiye Aziz Zanjani, Ph.D.</p>
+    <div class="footer-icons">
+      <a href="https://scholar.google.com/citations?user=vzA30FwAAAAJ&hl=en&oi=sra" target="_blank" rel="noopener noreferrer">Scholar</a>
+      <a href="https://www.researchgate.net/profile/Asiye-Aziz-Zanjani" target="_blank" rel="noopener noreferrer">ResearchGate</a>
+      <a href="https://www.linkedin.com/in/asiye-aziz-zanjani-1232ab59/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+      <a href="https://github.com/Asiye-Aziz-Zanjani" target="_blank" rel="noopener noreferrer">GitHub</a>
+      <a href="https://orcid.org/0000-0003-3344-9720" target="_blank" rel="noopener noreferrer">ORCID</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

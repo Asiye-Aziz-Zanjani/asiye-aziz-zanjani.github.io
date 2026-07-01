@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Crustal &amp; Upper Mantle Seismic Imaging — A. Aziz Zanjani</title>
+<link rel="stylesheet" href="style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,600;1,400&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+  /* ── Reset & tokens ── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ink:           #1a1a1e;
+    --ink-soft:      #3d3d45;
+    --ink-muted:     #7a7a88;
+    --paper:         #f7f6f2;
+    --paper-warm:    #eeede8;
+    --accent:        #1a4b7a;      /* deep blue — imaging / velocity */
+    --accent-light:  #d0e0f0;
+    --accent2:       #5b3a8c;      /* violet — rift / deep structure */
+    --accent2-light: #e8e0f4;
+    --seismic:       #c0392b;      /* red — earthquakes */
+    --seismic-light: #f2e0de;
+    --rule:          #d4d2cc;
+    --mono: 'IBM Plex Mono', monospace;
+    --serif: 'Libre Baskerville', Georgia, serif;
+    --sans: 'Inter', system-ui, sans-serif;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 17px;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── Preserve existing site nav & footer from style.css ── */
+  /* (nav, footer, .container, .page-header, .eyebrow, .paper-link
+     are all defined in the site's style.css and left untouched) */
+
+  /* ── Back link ── */
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    text-decoration: none;
+    margin: 2rem 0 2.5rem;
+    transition: color 0.2s;
+  }
+  .back-link:hover { color: var(--ink); }
+
+  /* ── Hero banner (sits below site nav) ── */
+  .research-hero {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 5rem 2rem 4rem;
+    margin-bottom: 0;
+    position: relative;
+    overflow: hidden;
+  }
+  .research-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      -55deg, transparent, transparent 28px,
+      rgba(26,75,122,0.07) 28px, rgba(26,75,122,0.07) 30px
+    );
+    pointer-events: none;
+  }
+  .research-hero-inner { max-width: 860px; margin: 0 auto; position: relative; }
+
+  .hero-eyebrow {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #7eadd4;
+    margin-bottom: 1.4rem;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+  }
+  .hero-eyebrow::after {
+    content: '';
+    display: block;
+    height: 1px;
+    width: 40px;
+    background: #7eadd4;
+    opacity: 0.6;
+  }
+
+  .research-hero h1 {
+    font-family: var(--serif);
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    font-weight: 700;
+    line-height: 1.18;
+    margin-bottom: 1.5rem;
+    color: #fff;
+  }
+  .research-hero h1 em { color: #7eadd4; font-style: italic; }
+
+  .hero-lead {
+    font-family: var(--serif);
+    font-size: 1.15rem;
+    font-style: italic;
+    color: rgba(247,246,242,0.72);
+    max-width: 640px;
+    line-height: 1.65;
+    margin-bottom: 2.5rem;
+  }
+
+  .hero-meta { display: flex; gap: 2rem; flex-wrap: wrap; }
+  .meta-item { font-family: var(--mono); font-size: 0.75rem; color: rgba(247,246,242,0.5); }
+  .meta-item strong { display: block; color: rgba(247,246,242,0.88); font-size: 0.8rem; margin-bottom: 0.2rem; }
+
+  /* ── Section nav strip ── */
+  .section-nav {
+    background: var(--paper-warm);
+    border-bottom: 1px solid var(--rule);
+    padding: 0 2rem;
+    position: sticky;
+    top: 0;
+    z-index: 90;
+  }
+  .section-nav-inner {
+    max-width: 860px;
+    margin: 0 auto;
+    display: flex;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .section-nav-inner::-webkit-scrollbar { display: none; }
+  .section-nav a {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    text-decoration: none;
+    padding: 0.85rem 1.2rem;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+    transition: color 0.2s, border-color 0.2s;
+  }
+  .section-nav a:hover { color: var(--ink); border-color: var(--accent); }
+
+  /* ── Main content ── */
+  .research-main {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 0 2rem 6rem;
+  }
+
+  /* ── Narrative sections ── */
+  .narrative-section {
+    padding: 4rem 0 1rem;
+    border-top: 1px solid var(--rule);
+    margin-top: 2rem;
+  }
+  .narrative-section:first-child { border-top: none; margin-top: 0; padding-top: 3.5rem; }
+
+  .section-label {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.8rem;
+  }
+  .section-label.violet { color: var(--accent2); }
+  .section-label.red    { color: var(--seismic); }
+
+  .narrative-section h2 {
+    font-family: var(--serif);
+    font-size: clamp(1.4rem, 3vw, 1.85rem);
+    font-weight: 700;
+    line-height: 1.25;
+    margin-bottom: 1.4rem;
+    color: var(--ink);
+  }
+  .narrative-section h2 em { font-style: italic; color: var(--accent2); }
+
+  h3 {
+    font-family: var(--serif);
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin: 2.2rem 0 0.7rem;
+    color: var(--ink);
+  }
+
+  .narrative-section p {
+    font-size: 1rem;
+    line-height: 1.8;
+    color: var(--ink-soft);
+    max-width: 720px;
+    margin-bottom: 1.2rem;
+  }
+  .narrative-section p:last-child { margin-bottom: 0; }
+  strong { color: var(--ink); font-weight: 600; }
+
+  /* ── Figure block ── */
+  .fig-block {
+    margin: 2.5rem 0;
+    border: 1px solid var(--rule);
+    background: #fff;
+    max-width: 720px;
+  }
+  .fig-img-area {
+    background: var(--paper-warm);
+    padding: 0;
+    border-bottom: 1px solid var(--rule);
+    overflow: hidden;
+  }
+  .fig-img-area img {
+    width: 100%;
+    display: block;
+  }
+  /* placeholder for missing images */
+  .fig-img-area.placeholder {
+    padding: 3.5rem 2rem;
+    text-align: center;
+  }
+  .fig-img-area.placeholder .fig-label {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+  .fig-img-area.placeholder .fig-desc {
+    font-size: 0.82rem;
+    color: var(--ink-muted);
+    line-height: 1.55;
+  }
+  .fig-caption {
+    padding: 0.9rem 1.1rem;
+    background: var(--paper-warm);
+  }
+  .fig-caption strong {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    display: block;
+    margin-bottom: 0.35rem;
+  }
+  .fig-caption p {
+    font-size: 0.85rem !important;
+    color: var(--ink-soft) !important;
+    margin: 0 !important;
+    max-width: none !important;
+    line-height: 1.55 !important;
+  }
+
+  /* ── Side-by-side (image | caption) figure layout ── */
+  .fig-block.fig-side {
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    max-width: 720px;
+  }
+  .fig-block.fig-side .fig-img-area {
+    border-bottom: none;
+    border-right: 1px solid var(--rule);
+    display: flex;
+    align-items: center;
+  }
+  .fig-block.fig-side .fig-img-area img {
+    width: 100%;
+  }
+  .fig-block.fig-side .fig-caption {
+    padding: 1rem 1.2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  @media (max-width: 600px) {
+    .fig-block.fig-side { grid-template-columns: 1fr; }
+    .fig-block.fig-side .fig-img-area { border-right: none; border-bottom: 1px solid var(--rule); }
+  }
+
+  /* ── Pull quote ── */
+  .pull-quote {
+    border-left: 3px solid var(--accent2);
+    margin: 2rem 0;
+    padding: 1.2rem 1.5rem;
+    background: var(--accent2-light);
+    max-width: 660px;
+  }
+  .pull-quote p {
+    font-family: var(--serif) !important;
+    font-size: 1.05rem !important;
+    font-style: italic;
+    color: var(--ink) !important;
+    margin: 0 !important;
+    line-height: 1.6 !important;
+  }
+  .pull-quote cite {
+    display: block;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--ink-muted);
+    margin-top: 0.6rem;
+    font-style: normal;
+  }
+
+  /* ── Inset note ── */
+  .inset-note {
+    border: 1px solid var(--accent);
+    background: var(--accent-light);
+    padding: 1.4rem 1.6rem;
+    margin: 2rem 0;
+    max-width: 720px;
+  }
+  .inset-note h4 {
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.6rem;
+  }
+  .inset-note p {
+    font-size: 0.9rem !important;
+    color: var(--ink-soft) !important;
+    margin-bottom: 0.5rem !important;
+    max-width: none !important;
+    line-height: 1.65 !important;
+  }
+  .inset-note p:last-child { margin-bottom: 0 !important; }
+
+  /* ── Stat row ── */
+  .stat-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 1px;
+    background: var(--rule);
+    border: 1px solid var(--rule);
+    margin: 2rem 0;
+    max-width: 720px;
+  }
+  .stat-cell { background: var(--paper); padding: 1.2rem 1.4rem; }
+  .stat-num {
+    font-family: var(--mono);
+    font-size: 1.65rem;
+    font-weight: 600;
+    line-height: 1;
+    display: block;
+    color: var(--ink);
+  }
+  .stat-num.blue   { color: var(--accent); }
+  .stat-num.violet { color: var(--accent2); }
+  .stat-num.red    { color: var(--seismic); }
+  .stat-label {
+    font-family: var(--sans);
+    font-size: 0.78rem;
+    color: var(--ink-muted);
+    margin-top: 0.35rem;
+    line-height: 1.3;
+  }
+
+  /* ── Method chain ── */
+  .method-chain {
+    display: flex;
+    align-items: flex-start;
+    gap: 0;
+    margin: 2rem 0;
+    max-width: 720px;
+    flex-wrap: wrap;
+  }
+  .chain-step {
+    flex: 1;
+    min-width: 120px;
+    text-align: center;
+    padding: 1.1rem 0.8rem;
+    border: 1px solid var(--rule);
+    background: #fff;
+    position: relative;
+  }
+  .chain-step + .chain-step { border-left: none; }
+  .chain-step::after {
+    content: '→';
+    position: absolute;
+    right: -0.9rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    color: var(--accent);
+    z-index: 1;
+  }
+  .chain-step:last-child::after { display: none; }
+  .chain-num {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    display: block;
+    margin-bottom: 0.3rem;
+  }
+  .chain-label {
+    font-family: var(--sans);
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--ink);
+    line-height: 1.3;
+  }
+  .chain-sub {
+    font-size: 0.72rem;
+    color: var(--ink-muted);
+    margin-top: 0.2rem;
+    line-height: 1.3;
+  }
+
+  /* ── Resource links ── */
+  .resource-links {
+    margin-top: 2rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  /* .paper-link is defined in style.css */
+
+  /* ── Footer override (keep existing site footer, just ensure spacing) ── */
+  footer { margin-top: 0; }
+
+  /* active research tab highlight */
+  .section-nav a.active { color: var(--ink); border-color: var(--accent); }
+</style>
+</head>
+<body>
+
+<!-- ══════ Site nav — from style.css ══════ -->
+<nav>
+  <div class="nav-inner">
+    <ul class="nav-links">
+      <li><a href="index.html">About</a></li>
+      <li><a href="research.html" class="active">Research</a></li>
+      <li><a href="publications.html">Publications</a></li>
+      <li><a href="software.html">Software &amp; Catalogs</a></li>
+      <li><a href="teaching.html">Teaching</a></li>
+      <li><a href="cv.html">CV</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- ══════ Hero ══════ -->
+<header class="research-hero">
+  <div class="research-hero-inner">
+    <div class="hero-eyebrow">Research · Seismic Imaging</div>
+    <h1>Listening to the Earth's <em>background hum</em></h1>
+    <p class="hero-lead">Oceans crash, winds blow, traffic rumbles—and every vibration propagates through the ground as seismic waves. What if that noise is not interference to remove, but the signal to process in order to resolve the subsurface? </p>
+    <div class="hero-meta">
+      <div class="meta-item"><strong>Method</strong>Ambient Noise Tomography . Receiver Function Analysis . Joine Inversion</div>
+      <div class="meta-item"><strong>Datasets</strong>Recorded Noise · Teleseismic Earthquakes</div>
+      <div class="meta-item"><strong>Regions</strong>Wabash Valley, IL/IN · SE New Mexico</div>
+    </div>
+  </div>
+</header>
+
+<!-- ══════ Section nav strip ══════ -->
+<!-- ══════ Research sub-nav (tabs) ══════ -->
+<nav class="section-nav" aria-label="Research areas">
+  <div class="section-nav-inner">
+    <a href="research.html">Overview</a>
+    <a href="research-ml.html">ML for Seismology</a>
+    <a href="research-imaging.html" class="active">Crustal Imaging</a>
+    <a href="research-induced.html">Induced Seismicity</a>
+    <a href="research-groundmotion.html" class="tab-gm">Ground Motion</a>
+  </div>
+</nav>
+
+<!-- ══════ Content ══════ -->
+<main>
+  <div class="research-main">
+
+    <a class="back-link" href="research.html">← Research overview</a>
+
+    <!-- ── Section 1: The method ── -->
+    <div class="narrative-section" id="noise">
+      <div class="section-label">The Approach</div>
+      <h2>Imaging the Earth with its own noise</h2>
+
+      <p>In earthquake seismology, noise is usually the interference to suppress so the seismic signal is easier to detect. But the Earth is never truly silent. Ocean waves crashing on coastlines, wind moving through forests, traffic on highways, all of it sends faint vibrations into the ground that travel as seismic waves across the planet. And critically, this background hum is not random. It is largely <strong>coherent</strong>: it travels predictably, follows known physical laws, and can be extracted and used.</p>
+
+      <p>By cross-correlating the noise recorded simultaneously at two stations over long time periods, we can reconstruct the <strong>Green's function</strong> between them, the seismic response of the Earth as if a tiny source were placed at one station and recorded at the other. Surface waves in these reconstructed Green's functions travel dispersively: their speed changes with frequency in a way that encodes the velocity structure of the crust along their path. If we measure enough of these frequency-dependent travel times across enough station pairs, and we can build a three-dimensional image of what the crust looks like beneath your feet, no earthquake required.</p>
+
+      <div class="method-chain">
+        <div class="chain-step">
+          <span class="chain-num">I</span>
+          <div class="chain-label">Record noise</div>
+          <div class="chain-sub">Months of continuous seismic data at each station </div>
+        </div>
+        <div class="chain-step">
+          <span class="chain-num">II</span>
+          <div class="chain-label">Cross-correlate</div>
+          <div class="chain-sub">All station pairs → calculate interstation Green's functions </div>
+        </div>
+        <div class="chain-step">
+          <span class="chain-num">III</span>
+          <div class="chain-label">Measure surface wave dispersion</div>
+          <div class="chain-sub">Rayleigh &amp; Love wave group/phase velocities vs. frequency </div>
+        </div>
+        <div class="chain-step">
+          <span class="chain-num">IV</span>
+          <div class="chain-label">Analyze Teleseismic Events</div>
+          <div class="chain-sub"> Receiver functions from P-to-S converted phases </div>
+        </div>
+        <div class="chain-step">
+          <span class="chain-num">V</span>
+          <div class="chain-label">Joint Inversion</div>
+          <div class="chain-sub"> surface wave dispersion + receiver functions → 3-D Vs model</div>
+        </div>
+      </div>
+
+      <div class="fig-block">
+        <div class="fig-img-area">
+          <img src="fig-img-5.png" alt="Depth sensitivity kernels for Love and Rayleigh waves">
+        </div>
+        <div class="fig-caption">
+          <strong>Figure 1. Depth sensitivity of surface waves</strong>
+          <p>Rayleigh and Love waves are sensitive to shear velocity at different depth ranges, and that sensitivity shifts with station spacing. Dense arrays (stations a few km apart) resolve fine structure in the upper crust; sparser regional networks penetrate deeper into the lower crust and uppermost mantle. Combining both in a joint inversion breaks trade-offs that neither dataset alone can resolve.</p>
+        </div>
+      </div>
+
+      <p>That last step, the joint inversion, matters. <strong>Surface wave dispersion</strong> and teleseismic <strong>receiver functions</strong> have complementary sensitivities: dispersion constrains average velocities within layers, while receiver functions constrain the impedance contrasts at layer boundaries using converted P-to-S phases that sharply image interfaces. Neither gives a complete picture alone.</p>
+    </div>
+
+    <!-- ── Section 2: Wabash Valley ── -->
+    <div class="narrative-section" id="wabash">
+      <div class="section-label violet">Case Study · Intraplate Seismicity</div>
+      <h2>A failed rift <em>hidden beneath the Midwest</em></h2>
+
+      <p>The American Midwest feels geologically quiet, flat farmland, no active volcanoes, far from any plate boundary. Yet the region hosts intraplate seismic zones capable of producing damaging earthquakes. The most famous is the New Madrid Seismic Zone, source of the largest historical earthquakes in the contiguous United States (1811–1812). To the north lies the <strong>Wabash Valley Seismic Zone</strong>, less well known, but geologically fascinating. It has produced four earthquakes larger than magnitude 6.8 in the past 12,000 years, and its cause has been debated for decades.</p>
+
+      <div class="pull-quote">
+        <p>The crust preserves the memory of a billion-year-old failed rift. By imaging the distributed deformation created during ancient continental extension, we can reconstruct how this fossil rift evolved and why it continues to influence present-day seismicity. </p>
+        <cite>— The central theme of the Wabash Valley study</cite>
+      </div>
+
+      <p>To investigate, I analyzed a <strong>300-km dense linear array</strong> of 44 broadband seismometers across the Wabash Valley, with station spacing as tight as 5 km in the central portion. This dense geometry unlocks short-period surface wave measurements that resolve upper-crustal structure at scales coarser arrays simply cannot see. I extracted thousands of interstation Green's functions, measured Rayleigh and Love wave dispersion across the full array and all available regional stations, and jointly inverted those measurements with receiver functions I calculated from recorded teleseismic events.</p>
+
+      <div class="stat-row">
+        <div class="stat-cell">
+          <span class="stat-num violet">300 km</span>
+          <div class="stat-label">Dense linear array profile across the Wabash Valley</div>
+        </div>
+        <div class="stat-cell">
+          <span class="stat-num violet">44</span>
+          <div class="stat-label">Broadband stations, 5 km spacing in central section</div>
+        </div>
+        <div class="stat-cell">
+          <span class="stat-num blue">M 6.8+</span>
+          <div class="stat-label">Four paleo-earthquakes in past 12,000 years in this zone</div>
+        </div>
+      </div>
+
+      <div class="fig-block fig-side">
+        <div class="fig-img-area">
+          <img src="fig-img-6.png" alt="Wabash Valley Seismic Zone map with array">
+        </div>
+        <div class="fig-caption">
+          <strong>Figure 2. The Wabash Valley Seismic Zone</strong>
+          <p>Red dots show seismicity in the zone, which coincides with the LaSalle Deformation Belt (dotted area), a proposed remnant of a failed Precambrian rift arm. Green triangles mark the dense linear array deployed for this study. The sparse seismicity makes this an ideal setting for ambient noise tomography: no large earthquakes to contaminate the noise cross-correlations, yet enough crustal complexity to make the imaging scientifically important 
+          <a href="https://doi.org/10.1029/2018JB016989" target="_blank" rel="noopener">(Aziz Zanjani et al. 2019).</a></p>
+        </div>
+      </div>
+
+      <div class="fig-block fig-side">
+        <div class="fig-img-area">
+          <img src="fig-img-7.png" alt="CCP stacked receiver functions along the Wabash Valley array">
+        </div>
+        <div class="fig-caption">
+          <strong>Figure 3. CCP-stacked receiver functions</strong>
+          <p>Common-Conversion-Point stacked receiver functions along the 300-km Wabash Valley profile. Three major P-to-S converted phases are visible: a shallow phase from the base of low-velocity sediments, a mid-crustal phase interpreted as the Conrad discontinuity, and the Moho at 6–7 seconds. Note the upward bend in the Moho near the center of the profile, a structural signal that the joint inversion would later reveal as a rift pillow 
+          <a href="https://doi.org/10.1029/2018JB016989" target="_blank" rel="noopener">(Aziz Zanjani et al. 2019).</a></p>
+        </div>
+      </div>
+
+      <div class="fig-block">
+        <div class="fig-img-area">
+          <img src="fig-img-8.png" alt="Ambient noise workflow and 2D crustal Vs model">
+          <img src="2D.png" alt="The general workflow and 2D shear wave velocity model along Wabash Valley">
+        </div>
+        <div class="fig-caption">
+          <strong>Figure 4. General workflow and 2-D crustal shear wave velocity model</strong>
+          <p>Joint inversion result for the Wabash Valley profile. Hatched regions above an uplifted Moho mark a high-velocity body interpreted as a rift pillow, magmatic material intruded from the mantle during a failed continental rift at the end of the Precambrian. Correlated velocity anomalies in the middle and upper crust (labeled A, B, C) indicate secondary igneous intrusions sourced from this deeper body. The asymmetry of the structure, the rift axis defined by the Moho uplift is offset ~30 km from the center of surface expression, is consistent with a simple-shear rift geometry
+          <a href="https://doi.org/10.1029/2018JB016989" target="_blank" rel="noopener">(Aziz Zanjani et al. 2019).</a></p>
+        </div>
+      </div>
+
+      <p>The velocity model tells a billion-year-old story. Beneath the La Salle Deformation Belt, a 50-km-wide high-velocity body sits directly above an uplifted Moho segment, the unmistakable signature of a <strong>rift pillow</strong>: dense mafic material intruded from the mantle during a continental rifting episode that started and then stalled. The rift froze, the crust cooled, and this fossil structure has been sitting there ever since, subtly concentrating stress in the overlying brittle crust. Correlated velocity anomalies in the middle and upper crust are consistent with secondary magmatic intrusions that rose from this deeper body, bimodal felsic-mafic igneous material similar to structures documented in other ancient rift systems worldwide.</p>
+
+      <p>Present-day seismicity in the Wabash Valley is most likely the result of ancient faults within this rift system being reactivated by the modern regional stress field. The failed rift created a zone of structural weakness and density contrast that focuses stress in the upper crust, much like the better-studied New Madrid Seismic Zone to the southwest, but narrower and less developed, which explains why the Wabash Valley's seismicity is more diffuse and spatially scattered.</p>
+
+      <div class="resource-links">
+        <a class="paper-link" href="https://doi.org/10.1029/2018JB016989" target="_blank">↗ Aziz Zanjani et al. (2019) — JGR Solid Earth</a>
+        <a class="paper-link" href="https://pubs.geoscienceworld.org/ssa/srl/article/92/6/3642/600685" target="_blank">↗ Herrmann et al. (2021) — SRL</a>
+        <a class="paper-link" href="https://rbherrmann.github.io/ComputerProgramsSeismology/index.html" target="_blank">↗ CPS Software: Dispersion &amp; Joint Inversion</a>
+      </div>
+    </div>
+
+    <!-- ── Section 3: SE New Mexico ── -->
+    <div class="narrative-section" id="new-mexico">
+      <div class="section-label red">Case Study · Induced Seismicity</div>
+      <h2>Imaging the <em>shaking ground</em> of southeast New Mexico</h2>
+
+      <p>The lessons from the Wabash Valley now drive new work in a very different setting. Of all earthquakes magnitude 3.0 and above recorded in New Mexico since 2020, roughly <strong>80% occurred in the southeast corner of the state</strong>, in and around the Permian Basin. Most are linked to oil and gas operations: wastewater from hydraulic fracturing injected back into shallow formations, altering pore pressures and pushing faults toward failure. The same mechanisms documented in the Texas side of the Delaware Basin are at work just across the state line.</p>
+
+      <p>Seismologists can detect these earthquakes. Locating them precisely, especially in depth, is the hard part. To use seismic wave travel times to determine earthquake locations, we need to know the velocity structure of the crust. We do not know that structure well enough in this region. Without a high-resolution 3D velocity model, earthquake depths remain uncertain, fault geometries stay blurred, and the ability to connect specific earthquakes to specific injection wells, the question that regulators and communities most need answered, is severely compromised.</p>
+
+      <div class="inset-note">
+        <h4>Why depth matters for induced seismicity</h4>
+        <p>In the Delaware Basin, saltwater disposal wells inject at different depths in different locations, and they overlap in time and space with hydraulic fracturing wells. Knowing which wells are driving seismicity, and through which geological formation, requires earthquake depths accurate to hundreds of meters, not kilometers. Without that, we risk reaching the wrong scientific conclusion and, consequently, the wrong regulatory response.</p>
+        <p>This is not a marginal technical concern. It is the difference between attributing an earthquake sequence to shallow injection (regulated, actionable) versus deep injection or production (different regulatory path). Velocity model quality directly determines what we can say about causality.</p>
+      </div>
+
+      <div class="fig-block">
+        <div class="fig-img-area">
+          <img src="fig-img-9.png" alt="Nodal array design for southeast New Mexico">
+        </div>
+        <div class="fig-caption">
+          <strong>Figure 9 — Nodal array deployment design, SE New Mexico</strong>
+          <p>Approximately 200 portable sensors will be deployed across the region in Summer 2026, recording continuously for one month. Station spacing is designed to resolve shallow crustal structure at scales directly relevant to induced seismicity, finer than any existing seismic network in the region. Nodes are compact, self-contained, and require no power infrastructure, making dense deployments in remote areas practical.</p>
+        </div>
+      </div>
+
+      <p>To address this, I designed a <strong>dense nodal deployment</strong> for southeast New Mexico: approximately 200 small, portable seismometers recording the Earth's ambient noise continuously for about a month. This strategy has several advantages over waiting for earthquakes. Noise-based Green's functions can be extracted from any time period regardless of earthquake occurrence, they provide uniform path coverage across the entire array, and crucially these measurements can be combined with previous deployments to build up a dispersion-measurement repository. More paths mean more stable tomographic inversions and better-constrained depth resolution across a wider depth range.</p>
+
+      <p>From those recordings, we will extract surface wave dispersion and build a high-resolution 3D shear wave velocity model of the shallow crust beneath southeast New Mexico. That model then feeds directly into earthquake relocation: constraining depths to the precision needed to connect seismicity patterns to specific geological formations and fault systems. It is the same inference chain developed in the Wabash Valley, noise to Green's functions to dispersion to velocity model to relocated earthquakes, now applied to an actively seismic, economically critical region where getting it right has immediate real-world stakes.</p>
+
+      <div class="resource-links">
+        <a class="paper-link" href="publications.html">↗ Related presentations at SSA 2026</a>
+      </div>
+    </div>
+
+  </div><!-- /research-main -->
+</main>
+
+<!-- ══════ Site footer — from style.css ══════ -->
+<footer>
+  <div class="footer-inner">
+    <p>&copy; 2026 Asiye Aziz Zanjani, Ph.D.</p>
+    <div class="footer-icons">
+      <a href="https://scholar.google.com/citations?user=vzA30FwAAAAJ&hl=en&oi=sra"
+         target="_blank" rel="noopener noreferrer">Scholar</a>
+      <a href="https://www.researchgate.net/profile/Asiye-Aziz-Zanjani"
+         target="_blank" rel="noopener noreferrer">ResearchGate</a>
+      <a href="https://www.linkedin.com/in/asiye-aziz-zanjani-1232ab59/"
+         target="_blank" rel="noopener noreferrer">LinkedIn</a>
+      <a href="https://github.com/Asiye-Aziz-Zanjani"
+         target="_blank" rel="noopener noreferrer">GitHub</a>
+      <a href="https://orcid.org/0000-0003-3344-9720"
+         target="_blank" rel="noopener noreferrer">ORCID</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
